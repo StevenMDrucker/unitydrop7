@@ -45,7 +45,7 @@ public class Grid : MonoBehaviour {
     private bool isFilling = false;
     private bool isUpdating = false;
     private int chainLevel = 0;
-    private long levelScore = 0;
+    private long levelScore = 0L;
     // Use this for initialization
     void Start()
     {
@@ -663,7 +663,8 @@ public class Grid : MonoBehaviour {
 
     private long computeScore(int chainlevel)
     {
-        return (3 * chainLevel * chainLevel);
+        long score = 3L * chainlevel * chainlevel;
+        return (score);
     }
     public void AddScoreText(int x, int y, int colnumber, int chainLevel)
     {
