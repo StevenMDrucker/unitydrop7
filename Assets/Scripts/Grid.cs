@@ -13,6 +13,7 @@ public struct Tuple
     }
 }
 
+
 public class Grid : MonoBehaviour {
 
     public enum PieceType
@@ -36,6 +37,7 @@ public class Grid : MonoBehaviour {
     public GameObject backgroundPrefab;
     public GameObject scorePrefab;
 
+    public GameObject LevelScoreText;
 
     private GamePiece nextPiece;
     private Dictionary<PieceType, GameObject> piecePrefabDict;
@@ -676,7 +678,8 @@ public class Grid : MonoBehaviour {
         levelScore += localScore;    
         thetext.text = localScore.ToString();
         thetext.color = colorList[colnumber - 1];
-
+        UnityEngine.UI.Text leveltext = LevelScoreText.GetComponent<UnityEngine.UI.Text>();
+        leveltext.text = levelScore.ToString();
 
         newObject.transform.parent = transform;
     }
