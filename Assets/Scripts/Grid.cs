@@ -38,6 +38,10 @@ public class Grid : MonoBehaviour {
     public GameObject scorePrefab;
 
     public GameObject LevelScoreText;
+    public GameObject ChainLevelText;
+    public GameObject LevelNo;
+    public GameObject NumDropsIndicator;
+
 
     private GamePiece nextPiece;
     private Dictionary<PieceType, GameObject> piecePrefabDict;
@@ -48,7 +52,17 @@ public class Grid : MonoBehaviour {
     private bool isUpdating = false;
     private int chainLevel = 0;
     private long levelScore = 0L;
+
+    private int currentLevel = 0;
     // Use this for initialization
+    private numDropIndicator DropIndicator;
+
+    private UnityEngine.UI.Text scoretext;
+    private UnityEngine.UI.Text chainleveltext;
+    private UnityEngine.UI.Text levelcounttext;
+    private int currentDropNumber = 0;
+    private int currentLevelDropNumber = 0;
+
     void Start()
     {
         piecePrefabDict = new Dictionary<PieceType, GameObject>();
@@ -85,7 +99,8 @@ public class Grid : MonoBehaviour {
                 SpawnNewPiece(x, y, PieceType.EMPTY);
             }
         }
-
+        
+        
         StartCoroutine(Fill());
 
         GameObject nPiece = (GameObject)Instantiate(piecePrefabDict[PieceType.NORMAL], GetWorldPosition(3, -1), Quaternion.identity);
@@ -96,7 +111,16 @@ public class Grid : MonoBehaviour {
     }
 
 
+    void Awake()
+    {
+            scoretext = LevelScoreText.GetComponent<UnityEngine.UI.Text>();
+            chainleveltext = ChainLevelText.GetComponent<UnityEngine.UI.Text>();
+            scoretext.text = "";
+            levelcounttext = LevelNo.GetComponent<UnityEngine.UI.Text>();
 
+
+            DropIndicator = NumDropsIndicator.GetComponent<numDropIndicator>();
+    }
     public bool AddBottomRow()
     {
         // check top row
@@ -276,7 +300,8 @@ public class Grid : MonoBehaviour {
     public void addToColumn(int x, int y)
     {
         GamePiece pieceBelow = pieces[x, 0];
-
+        
+        
         chainLevel = 0;
         if (!isFilling && !isUpdating)
         {
@@ -306,6 +331,14 @@ public class Grid : MonoBehaviour {
         yield return Fill();
         //yield return new WaitForSeconds(0.5f);
         yield return updateBoard(++cl);
+        currentDropNumber++;
+        currentLevelDropNumber++;
+        if (currentLevelDropNumber == DropIndicator.levelDrops) {
+            currentLevelDropNumber = 0;
+            StartCoroutine(addRow());
+        } 
+        DropIndicator.SetDropCount(DropIndicator.levelDrops-currentLevelDropNumber-1);
+
         isUpdating = false;
     }
 
@@ -313,6 +346,8 @@ public class Grid : MonoBehaviour {
     {
         isUpdating = true;
         yield return (AddBottomRow());
+        currentLevel++;
+        levelcounttext.text = "Level #:" + currentLevel.ToString();
         yield return new WaitForSeconds(0.5f);
         yield return updateBoard(0);
         isUpdating = false;
@@ -678,10 +713,15 @@ public class Grid : MonoBehaviour {
         levelScore += localScore;    
         thetext.text = localScore.ToString();
         thetext.color = colorList[colnumber - 1];
-        UnityEngine.UI.Text leveltext = LevelScoreText.GetComponent<UnityEngine.UI.Text>();
-        leveltext.text = levelScore.ToString();
+        // UnityEngine.UI.Text leveltext = LevelScoreText.GetComponent<UnityEngine.UI.Text>();
+        scoretext.text = levelScore.ToString();
 
-        newObject.transform.parent = transform;
+        if (chainLevel > 1) {
+            chainleveltext.text = "Chain x" + chainLevel.ToString();
+            chainleveltext.CrossFadeAlpha(1.0f, 0.05f, true);
+        }
+
+        newObject.transform.SetParent(transform);
     }
 
     public bool ClearPiece(int row, int col, int chainLevel)
@@ -701,7 +741,7 @@ public class Grid : MonoBehaviour {
         bool[,] toHighlight;
       
         bool didRemove = true;
-                
+        
         while (didRemove)
         {
             while (isFilling)
@@ -720,6 +760,8 @@ public class Grid : MonoBehaviour {
             StartCoroutine(Fill());
         }
         nextPiece.gameObject.SetActive(true);
+       // ChainLevelText.SetActive(false);
+        chainleveltext.CrossFadeAlpha(0.0f, 1.0f, true);
     }
 
     private List<Tuple> getNeighborList(int x, int y)

@@ -19,6 +19,8 @@ public class SimpleControl : MonoBehaviour {
     public void OnMouseDown()
     {
    //     grid.AddBottomRow();
-        StartCoroutine(grid.addRow());
+  //        StartCoroutine(grid.addRow());
+
+           grid.NumDropsIndicator.GetComponent<numDropIndicator>().SetDropCount(Random.Range(0,10));
     }
 }
