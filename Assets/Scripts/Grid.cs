@@ -366,7 +366,7 @@ public class Grid : MonoBehaviour {
         GamePiece currentPiece = pieces[x,y];
         int colorno  = currentPiece.GetColorNumber();
         bool didRemove = false;
-        if (colorno > 0) {
+        if ((colorno > 0) && (colorno < (int)ColorPiece.ColorType.COUNT - 1)) {
             for (int lx = 0; lx< xDim; lx++) {
                 for (int ly = 0; ly<yDim; ly++) {
                     if (pieces[lx,ly].GetColorNumber() == colorno) {
