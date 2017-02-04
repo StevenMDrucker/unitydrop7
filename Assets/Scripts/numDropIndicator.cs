@@ -2,12 +2,18 @@
 
 public class numDropIndicator : MonoBehaviour {
 
-	public int levelDrops;
+	private int levelDrops;
+
+    public int LevelDrops
+    {
+        get { return levelDrops; }
+    }
 	public GameObject dropPrefab;
 	private GameObject [] dropArray;
 
 	// Use this for initialization
 	void Start () {
+		//SetTotalDropNumber(levelDrops);
 		SetTotalDropNumber(levelDrops);
 	}
 	
@@ -18,12 +24,15 @@ public class numDropIndicator : MonoBehaviour {
 
 	public void SetTotalDropNumber(int numDrops)
 	{
+		levelDrops = numDrops;
 		dropArray = new GameObject[numDrops];
-		for (int x = 0; x<numDrops; x++) {
-			GameObject newObject = (GameObject)Instantiate(dropPrefab, new Vector2((float)x * 0.2f - 8.0f, -2.0f), Quaternion.identity);
+		for (int i = 0; i<numDrops; i++) {
+			int x = i % 15;
+			int y = i / 15;
+			GameObject newObject = (GameObject)Instantiate(dropPrefab, new Vector2((float)x * 0.2f - 8.0f, -2.0f - (0.25f * y)), Quaternion.identity);
 			newObject.transform.localScale = new Vector2(0.2f,0.2f);
 			newObject.transform.SetParent(this.transform);
-			dropArray[x]=newObject;
+			dropArray[i]=newObject;
 		}
 	}
 

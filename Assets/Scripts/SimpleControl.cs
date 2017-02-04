@@ -20,7 +20,7 @@ public class SimpleControl : MonoBehaviour {
     {
    //     grid.AddBottomRow();
   //        StartCoroutine(grid.addRow());
-
-           grid.NumDropsIndicator.GetComponent<numDropIndicator>().SetDropCount(Random.Range(0,10));
+           // grid.NumDropsIndicator.GetComponent<numDropIndicator>().SetDropCount(Random.Range(0,10));           
+           grid.enterHammerMode();
     }
 }

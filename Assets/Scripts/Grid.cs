@@ -36,12 +36,11 @@ public class Grid : MonoBehaviour {
     public PiecePrefab[] piecePrefabs;
     public GameObject backgroundPrefab;
     public GameObject scorePrefab;
-
+    public GameObject hammerPrefab;
     public GameObject LevelScoreText;
     public GameObject ChainLevelText;
     public GameObject LevelNo;
     public GameObject NumDropsIndicator;
-
 
     private GamePiece nextPiece;
     private Dictionary<PieceType, GameObject> piecePrefabDict;
@@ -62,7 +61,13 @@ public class Grid : MonoBehaviour {
     private UnityEngine.UI.Text levelcounttext;
     private int currentDropNumber = 0;
     private int currentLevelDropNumber = 0;
+    public int LevelInfoNumDrops;
+    public int LevelInfoAddRowBonus = 5000;
 
+    private float ChainFadeSpeed = 2.0f;
+
+    private GameObject hammer;
+    private bool hammerMode = false;
     void Start()
     {
         piecePrefabDict = new Dictionary<PieceType, GameObject>();
@@ -108,6 +113,11 @@ public class Grid : MonoBehaviour {
         nextPiece = nPiece.GetComponent<GamePiece>();
         nextPiece.Init(3, -1, this, PieceType.NORMAL);
         nextPiece.ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, nextPiece.ColorComponent.NumColors - 1));
+
+        hammer = (GameObject)Instantiate(hammerPrefab, GetWorldPosition(3, -1), Quaternion.identity);
+        hammer.transform.parent = transform;
+        hammer.SetActive(false);
+
     }
 
 
@@ -115,11 +125,11 @@ public class Grid : MonoBehaviour {
     {
             scoretext = LevelScoreText.GetComponent<UnityEngine.UI.Text>();
             chainleveltext = ChainLevelText.GetComponent<UnityEngine.UI.Text>();
+            chainleveltext.text = "";
             scoretext.text = "";
             levelcounttext = LevelNo.GetComponent<UnityEngine.UI.Text>();
-
-
             DropIndicator = NumDropsIndicator.GetComponent<numDropIndicator>();
+            DropIndicator.SetTotalDropNumber(LevelInfoNumDrops);
     }
     public bool AddBottomRow()
     {
@@ -296,6 +306,55 @@ public class Grid : MonoBehaviour {
         nextPiece.transform.position = GetWorldPosition(xcol, -1);        
     }
 
+    public void enterHammerMode()
+    {
+        //techincally toggle hammerMode
+        if (hammerMode) {
+            exitHammerMode();
+        } else {
+            hammerMode = true;
+            hammer.SetActive(true);
+            nextPiece.gameObject.SetActive(false);
+        }
+    }
+
+    public void exitHammerMode()
+    {
+        hammerMode = false;
+        hammer.SetActive(false);
+        nextPiece.gameObject.SetActive(true);        
+    }
+
+    public IEnumerator hammerPiece(int x, int y)
+    {
+        isUpdating = true;
+        currentLevel++;
+        bool didRemove = ClearPiece(x, y, 0);
+        if (didRemove) {
+            yield return new WaitForSeconds(0.2f);            
+            yield return fillAndUpdate(0);
+        }
+        isUpdating = false;
+    }
+    public void handleMouseDown(int x, int y)
+    {
+        if (hammerMode) {
+            // delete element
+            StartCoroutine(hammerPiece(x,y));
+            exitHammerMode();
+        } else {
+            addToColumn(x,y);
+        }
+    }
+
+    public void handleMouseEnter(int x, int y)
+    {
+        if (hammerMode) {
+            hammer.transform.position = GetWorldPosition(x,y);
+        } else {
+            highlightColumn(x);
+        }
+    }
 
     public void addToColumn(int x, int y)
     {
@@ -333,23 +392,23 @@ public class Grid : MonoBehaviour {
         yield return updateBoard(++cl);
         currentDropNumber++;
         currentLevelDropNumber++;
-        if (currentLevelDropNumber == DropIndicator.levelDrops) {
+        if (currentLevelDropNumber == DropIndicator.LevelDrops) {
             currentLevelDropNumber = 0;
-            StartCoroutine(addRow());
+            StartCoroutine(addRow(cl));
         } 
-        DropIndicator.SetDropCount(DropIndicator.levelDrops-currentLevelDropNumber-1);
+        DropIndicator.SetDropCount(DropIndicator.LevelDrops-currentLevelDropNumber-1);
 
         isUpdating = false;
     }
 
-    public IEnumerator addRow()
+    public IEnumerator addRow(int cl)
     {
         isUpdating = true;
         yield return (AddBottomRow());
         currentLevel++;
         levelcounttext.text = "Level #:" + currentLevel.ToString();
         yield return new WaitForSeconds(0.5f);
-        yield return updateBoard(0);
+        yield return updateBoard(cl);
         isUpdating = false;
     }
 
@@ -683,7 +742,8 @@ public class Grid : MonoBehaviour {
 
         GameObject highl = backgroundPieces[row, col].gameObject.transform.FindChild("highlightsquare").gameObject;
         SpriteRenderer aRender = highl.GetComponent<SpriteRenderer>();
-        Color newColor = new Color(1.0f, 1.0f, 1.0f, 0.3f);
+        Color newColor = new Color(1.0f, 1.0f, 1.0f, 0.2f);
+        
         aRender.color = newColor; 
     }
 
@@ -705,7 +765,7 @@ public class Grid : MonoBehaviour {
     }
     public void AddScoreText(int x, int y, int colnumber, int chainLevel)
     {
-        Color[] colorList = { Color.green, Color.yellow, new Color(1.0f, 0.6f, 0.0f), Color.red, new Color(0.5f, 0.0f, 0.5f), Color.cyan, Color.blue };
+        Color[] colorList = { Color.green, Color.yellow, new Color(1.0f, 0.6f, 0.0f), Color.red, new Color(0.5f, 0.0f, 0.5f), Color.cyan, Color.blue, Color.gray, Color.gray };
         GameObject newObject = (GameObject)Instantiate(scorePrefab, GetWorldPosition((float)x+1.5f, (float)y-.5f), Quaternion.identity);
         GameObject scoreText = newObject.transform.FindChild("Text").gameObject;
         UnityEngine.UI.Text thetext = scoreText.GetComponent<UnityEngine.UI.Text>();
@@ -761,7 +821,7 @@ public class Grid : MonoBehaviour {
         }
         nextPiece.gameObject.SetActive(true);
        // ChainLevelText.SetActive(false);
-        chainleveltext.CrossFadeAlpha(0.0f, 1.0f, true);
+        chainleveltext.CrossFadeAlpha(0.0f, ChainFadeSpeed, true);
     }
 
     private List<Tuple> getNeighborList(int x, int y)
@@ -806,7 +866,8 @@ public class Grid : MonoBehaviour {
                             }
                             else if (neighborPiece.ColorComponent.Color == ColorPiece.ColorType.EGGCRACKED)
                             {
-                                neighborPiece.ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, nextPiece.ColorComponent.NumColors - 2));
+//                                neighborPiece.ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, nextPiece.ColorComponent.NumColors - 2));
+                                neighborPiece.ColorComponent.SetColor(neighborPiece.ColorComponent.HiddenColor);
                             }
                         }
                     }

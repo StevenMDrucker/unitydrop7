@@ -40,6 +40,11 @@ public class ColorPiece : MonoBehaviour {
 		get { return colorSprites.Length; }
 	}
 
+	private ColorType hiddenColor;
+	public ColorType HiddenColor{
+		get {return hiddenColor;}
+	}
+
 	private SpriteRenderer sprite;
 	private Dictionary<ColorType, Sprite> colorSpriteDict;
 
@@ -72,6 +77,10 @@ public class ColorPiece : MonoBehaviour {
 
 		if (colorSpriteDict.ContainsKey (newColor)) {
 			sprite.sprite = colorSpriteDict [newColor];
+		}
+
+		if (newColor == ColorType.EGG) {
+			hiddenColor = (ColorPiece.ColorType)Random.Range(0, NumColors - 2);
 		}
 	}
 }

@@ -65,12 +65,14 @@ public class BackgroundPiece : MonoBehaviour {
 
     public void OnMouseDown()
     {
-        grid.addToColumn(this.X, this.Y);
+        // grid.addToColumn(this.X, this.Y);
+        grid.handleMouseDown(this.X, this.Y);
     }
 
     public void OnMouseEnter()
     {
-       grid.highlightColumn(this.X);
+//       grid.highlightColumn(this.X);
+        grid.handleMouseEnter(this.X, this.Y);
     }
 
     public void OnMouseExit()

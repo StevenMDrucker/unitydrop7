@@ -112,12 +112,14 @@ public class GamePiece : MonoBehaviour {
     
     public void OnMouseDown()
     {
-        grid.addToColumn(this.X, this.Y);
+        
+        grid.handleMouseDown(this.X, this.Y);
     }
 
     public void OnMouseEnter()
     {
-        grid.highlightColumn(this.X);
+        grid.handleMouseEnter(this.X, this.Y);
+        //grid.highlightColumn(this.X);
     }
 
     public void OnMouseExit()
