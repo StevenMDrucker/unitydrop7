@@ -23,6 +23,13 @@ public class Grid : MonoBehaviour {
         COUNT,
     };
 
+    public enum InteractMode 
+    {
+        NORMAL,
+        HAMMER,
+        BOMB
+    }
+    private InteractMode mode = InteractMode.NORMAL;
     [System.Serializable]
     public struct PiecePrefab
     {
@@ -37,6 +44,7 @@ public class Grid : MonoBehaviour {
     public GameObject backgroundPrefab;
     public GameObject scorePrefab;
     public GameObject hammerPrefab;
+    public GameObject bombPrefab;
     public GameObject LevelScoreText;
     public GameObject ChainLevelText;
     public GameObject LevelNo;
@@ -67,7 +75,8 @@ public class Grid : MonoBehaviour {
     private float ChainFadeSpeed = 2.0f;
 
     private GameObject hammer;
-    private bool hammerMode = false;
+    private GameObject bomb;
+    
     void Start()
     {
         piecePrefabDict = new Dictionary<PieceType, GameObject>();
@@ -117,6 +126,10 @@ public class Grid : MonoBehaviour {
         hammer = (GameObject)Instantiate(hammerPrefab, GetWorldPosition(3, -1), Quaternion.identity);
         hammer.transform.parent = transform;
         hammer.SetActive(false);
+
+        bomb = (GameObject)Instantiate(bombPrefab, GetWorldPosition(3, -1), Quaternion.identity);
+        bomb.transform.parent = transform;
+        bomb.SetActive(false);
 
     }
 
@@ -306,13 +319,34 @@ public class Grid : MonoBehaviour {
         nextPiece.transform.position = GetWorldPosition(xcol, -1);        
     }
 
+    public void enterBombMode()
+    {
+        //techincally toggle hammerMode
+        if (mode == InteractMode.BOMB) {
+            exitBombMode();
+        } else {
+            mode = InteractMode.BOMB;
+            bomb.SetActive(true);
+            nextPiece.gameObject.SetActive(false);
+        }
+        
+    }
+
+    public void exitBombMode()
+    {
+        mode = InteractMode.NORMAL;        
+        bomb.SetActive(false);
+        nextPiece.gameObject.SetActive(true);        
+        
+    }
+
     public void enterHammerMode()
     {
         //techincally toggle hammerMode
-        if (hammerMode) {
+        if (mode == InteractMode.HAMMER) {
             exitHammerMode();
         } else {
-            hammerMode = true;
+            mode = InteractMode.HAMMER;
             hammer.SetActive(true);
             nextPiece.gameObject.SetActive(false);
         }
@@ -320,11 +354,34 @@ public class Grid : MonoBehaviour {
 
     public void exitHammerMode()
     {
-        hammerMode = false;
+        mode = InteractMode.NORMAL;        
         hammer.SetActive(false);
         nextPiece.gameObject.SetActive(true);        
     }
+    public IEnumerator bombPiece(int x, int y)
+    {
+        // remove all pieces with the same number as the piece that it's over
+        isUpdating = true;
+        currentLevel++;
+        GamePiece currentPiece = pieces[x,y];
+        int colorno  = currentPiece.GetColorNumber();
+        bool didRemove = false;
+        if (colorno > 0) {
+            for (int lx = 0; lx< xDim; lx++) {
+                for (int ly = 0; ly<yDim; ly++) {
+                    if (pieces[lx,ly].GetColorNumber() == colorno) {
+                        didRemove = ClearPiece(lx, ly, 0);    
+                    }
+                }
+            }
+        }
+        if (didRemove) {
+            yield return new WaitForSeconds(0.2f);            
+            yield return fillAndUpdate(0);
+        }
+        isUpdating = false;
 
+    }
     public IEnumerator hammerPiece(int x, int y)
     {
         isUpdating = true;
@@ -338,19 +395,27 @@ public class Grid : MonoBehaviour {
     }
     public void handleMouseDown(int x, int y)
     {
-        if (hammerMode) {
+        if (mode==InteractMode.HAMMER) {
             // delete element
             StartCoroutine(hammerPiece(x,y));
             exitHammerMode();
-        } else {
+        }
+        else if (mode == InteractMode.BOMB) {
+            StartCoroutine(bombPiece(x,y));
+            exitBombMode();
+            
+        }        
+        else {
             addToColumn(x,y);
         }
     }
 
     public void handleMouseEnter(int x, int y)
     {
-        if (hammerMode) {
+        if (mode == InteractMode.HAMMER) {
             hammer.transform.position = GetWorldPosition(x,y);
+        } if (mode == InteractMode.BOMB) {
+            bomb.transform.position = GetWorldPosition(x,y);
         } else {
             highlightColumn(x);
         }
