@@ -27,7 +27,8 @@ public class Grid : MonoBehaviour {
     {
         NORMAL,
         HAMMER,
-        BOMB
+        BOMB,
+        GAMEOVER
     }
     private InteractMode mode = InteractMode.NORMAL;
     [System.Serializable]
@@ -37,18 +38,38 @@ public class Grid : MonoBehaviour {
         public GameObject prefab;
     };
 
+    public struct GameStats {
+        public long currentScore;
+        public int currentDrop;
+        public int currentDropsPerRound;
+        public int maxChainLevel;
+        public long maxScoreinaDrop;
+        public int currentLevel; 
+        public int currentChainLevel;
+
+        public void init()
+        {
+            currentScore = 0L;
+            currentDrop = 0;
+            currentDropsPerRound = 0;
+            maxChainLevel = 0;
+            maxScoreinaDrop = 0;
+            currentLevel = 0;
+            currentChainLevel = 0;
+        }   
+    }
+
+    public GameStats currentGameStats;
     public int xDim;
     public int yDim;
     public float fillTime;
+    public GameObject mainDisplay;
     public PiecePrefab[] piecePrefabs;
     public GameObject backgroundPrefab;
     public GameObject scorePrefab;
     public GameObject hammerPrefab;
     public GameObject bombPrefab;
-    public GameObject LevelScoreText;
-    public GameObject ChainLevelText;
-    public GameObject LevelNo;
-    public GameObject NumDropsIndicator;
+    
 
     private GamePiece nextPiece;
     private Dictionary<PieceType, GameObject> piecePrefabDict;
@@ -57,26 +78,12 @@ public class Grid : MonoBehaviour {
     private BackgroundPiece[,] backgroundPieces;
     private bool isFilling = false;
     private bool isUpdating = false;
-    private int chainLevel = 0;
-    private long levelScore = 0L;
-
-    private int currentLevel = 0;
-    // Use this for initialization
-    private numDropIndicator DropIndicator;
-
-    private UnityEngine.UI.Text scoretext;
-    private UnityEngine.UI.Text chainleveltext;
-    private UnityEngine.UI.Text levelcounttext;
-    private int currentDropNumber = 0;
-    private int currentLevelDropNumber = 0;
-    public int LevelInfoNumDrops;
-    public int LevelInfoAddRowBonus = 5000;
-
     private float ChainFadeSpeed = 2.0f;
 
     private GameObject hammer;
     private GameObject bomb;
     
+    private UIDisplay UIDisplayComponent;
     void Start()
     {
         piecePrefabDict = new Dictionary<PieceType, GameObject>();
@@ -135,18 +142,14 @@ public class Grid : MonoBehaviour {
 
 
     void Awake()
-    {
-            scoretext = LevelScoreText.GetComponent<UnityEngine.UI.Text>();
-            chainleveltext = ChainLevelText.GetComponent<UnityEngine.UI.Text>();
-            chainleveltext.text = "";
-            scoretext.text = "";
-            levelcounttext = LevelNo.GetComponent<UnityEngine.UI.Text>();
-            DropIndicator = NumDropsIndicator.GetComponent<numDropIndicator>();
+    {            
+            UIDisplayComponent = mainDisplay.GetComponent<UIDisplay>();
             
-            LevelInfoNumDrops = Level.currentLevelInfo.DropsPerRound;
+            UIDisplayComponent.DropsLeftText = Level.currentLevelInfo.TotalDropsPerLevel.ToString();
+            UIDisplayComponent.SetTotalDrops(Level.currentLevelInfo.DropsPerRound);
 
-
-            DropIndicator.SetTotalDropNumber(LevelInfoNumDrops);
+            currentGameStats.init();
+            
     }
     public bool AddBottomRow()
     {
@@ -156,8 +159,7 @@ public class Grid : MonoBehaviour {
             GamePiece piece = pieces[x, 0];
             if (piece.Type != PieceType.EMPTY)
             {
-                // Game Over
-                return (true);
+                gameOver();
             } else { 
                 Destroy(pieces[x, 0].gameObject);
             }
@@ -366,7 +368,6 @@ public class Grid : MonoBehaviour {
     {
         // remove all pieces with the same number as the piece that it's over
         isUpdating = true;
-        currentLevel++;
         GamePiece currentPiece = pieces[x,y];
         int colorno  = currentPiece.GetColorNumber();
         bool didRemove = false;
@@ -389,7 +390,6 @@ public class Grid : MonoBehaviour {
     public IEnumerator hammerPiece(int x, int y)
     {
         isUpdating = true;
-        currentLevel++;
         bool didRemove = ClearPiece(x, y, 0);
         if (didRemove) {
             yield return new WaitForSeconds(0.2f);            
@@ -409,7 +409,7 @@ public class Grid : MonoBehaviour {
             exitBombMode();
             
         }        
-        else {
+        else if (mode == InteractMode.NORMAL) {
             addToColumn(x,y);
         }
     }
@@ -418,9 +418,9 @@ public class Grid : MonoBehaviour {
     {
         if (mode == InteractMode.HAMMER) {
             hammer.transform.position = GetWorldPosition(x,y);
-        } if (mode == InteractMode.BOMB) {
+        } else if (mode == InteractMode.BOMB) {
             bomb.transform.position = GetWorldPosition(x,y);
-        } else {
+        } else if (mode == InteractMode.NORMAL) {
             highlightColumn(x);
         }
     }
@@ -429,14 +429,20 @@ public class Grid : MonoBehaviour {
     {
         GamePiece pieceBelow = pieces[x, 0];
         
-        
-        chainLevel = 0;
+        currentGameStats.currentChainLevel = 0;
         if (!isFilling && !isUpdating)
         {
             if (pieceBelow.Type == PieceType.EMPTY)
             {
+                currentGameStats.currentDropsPerRound++;
+                if (Level.currentLevelInfo.DropsPerRound > 0) {
+                    // this level counts how many rounds, so let's display how many left
+                    currentGameStats.currentDrop++;
+                    UIDisplayComponent.DropsLeftText = (Level.currentLevelInfo.TotalDropsPerLevel - currentGameStats.currentDrop).ToString() + " Drops Left";
+                }
                 // hide preview piece
                 nextPiece.gameObject.SetActive(false);
+
                 Destroy(pieceBelow.gameObject);
                 GameObject newPiece = (GameObject)Instantiate(piecePrefabDict[PieceType.NORMAL], GetWorldPosition(x, -1), Quaternion.identity);
                 newPiece.transform.parent = transform;
@@ -448,25 +454,27 @@ public class Grid : MonoBehaviour {
 
                 nextPiece.ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, nextPiece.ColorComponent.NumColors - 1));
             }
-            StartCoroutine(fillAndUpdate(chainLevel));
+            StartCoroutine(fillAndUpdate(currentGameStats.currentChainLevel));
         }
     }
 
 
 
     public IEnumerator fillAndUpdate(int cl) {
+        if (cl > currentGameStats.maxChainLevel) {
+            currentGameStats.maxChainLevel = cl;
+        }
         isUpdating = true;
         yield return Fill();
         //yield return new WaitForSeconds(0.5f);
         yield return updateBoard(++cl);
-        currentDropNumber++;
-        currentLevelDropNumber++;
-        if (currentLevelDropNumber == DropIndicator.LevelDrops) {
-            currentLevelDropNumber = 0;
+        if (currentGameStats.currentDropsPerRound == Level.currentLevelInfo.DropsPerRound) {
+            currentGameStats.currentDropsPerRound = 0;
             StartCoroutine(addRow(cl));
         } 
-        DropIndicator.SetDropCount(DropIndicator.LevelDrops-currentLevelDropNumber-1);
+        UIDisplayComponent.SetDropCount(Level.currentLevelInfo.DropsPerRound - currentGameStats.currentDropsPerRound -1 );
 
+        checkGameOver();
         isUpdating = false;
     }
 
@@ -474,8 +482,10 @@ public class Grid : MonoBehaviour {
     {
         isUpdating = true;
         yield return (AddBottomRow());
-        currentLevel++;
-        levelcounttext.text = "Level #:" + currentLevel.ToString();
+        currentGameStats.currentLevel++;
+        
+        UIDisplayComponent.LevelNoText = "Level #:" + currentGameStats.currentLevel.ToString();
+        
         yield return new WaitForSeconds(0.5f);
         yield return updateBoard(cl);
         isUpdating = false;
@@ -839,15 +849,14 @@ public class Grid : MonoBehaviour {
         GameObject scoreText = newObject.transform.FindChild("Text").gameObject;
         UnityEngine.UI.Text thetext = scoreText.GetComponent<UnityEngine.UI.Text>();
         long localScore = computeScore(chainLevel);
-        levelScore += localScore;    
+        currentGameStats.currentScore += localScore;
         thetext.text = localScore.ToString();
         thetext.color = colorList[colnumber - 1];
-        // UnityEngine.UI.Text leveltext = LevelScoreText.GetComponent<UnityEngine.UI.Text>();
-        scoretext.text = levelScore.ToString();
+        UIDisplayComponent.CurrentScoreText = currentGameStats.currentScore.ToString();
 
         if (chainLevel > 1) {
-            chainleveltext.text = "Chain x" + chainLevel.ToString();
-            chainleveltext.CrossFadeAlpha(1.0f, 0.05f, true);
+            UIDisplayComponent.ChainNumberText = "Chain x" + chainLevel.ToString();
+            UIDisplayComponent.CrossFadeLevelText(1.0f, 0.05f);
         }
 
         newObject.transform.SetParent(transform);
@@ -889,8 +898,7 @@ public class Grid : MonoBehaviour {
             StartCoroutine(Fill());
         }
         nextPiece.gameObject.SetActive(true);
-       // ChainLevelText.SetActive(false);
-        chainleveltext.CrossFadeAlpha(0.0f, ChainFadeSpeed, true);
+        UIDisplayComponent.CrossFadeLevelText(0.0f, ChainFadeSpeed);
     }
 
     private List<Tuple> getNeighborList(int x, int y)
@@ -943,6 +951,22 @@ public class Grid : MonoBehaviour {
                 }
             }
         }
-    }    
+    }  
+
+
+    public void checkGameOver()
+    {
+        // you should check to see based on game type too
+        if (Level.currentLevelInfo.TotalDropsPerLevel > 0) {
+            if (currentGameStats.currentDrop >= Level.currentLevelInfo.TotalDropsPerLevel) {
+                gameOver();
+            }
+        }
+    }  
     
+    public void gameOver()
+    {
+        mode = InteractMode.GAMEOVER;
+        UIDisplayComponent.showGameOver();   
+    }
 }

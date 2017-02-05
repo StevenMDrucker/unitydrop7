@@ -13,6 +13,7 @@ public class Level : MonoBehaviour {
 	
 	public GameObject levelButtonPrefab;
 
+
 static public LevelInfo currentLevelInfo = new LevelInfo();
 	GameObject[] leveObjectArray;
 //	public Grid grid;
@@ -47,6 +48,7 @@ static public LevelInfo currentLevelInfo = new LevelInfo();
 		currentLevelInfo.DropsPerRound = levels.levelInfo[i].DropsPerRound;
 		currentLevelInfo.LevelType = levels.levelInfo[i].LevelType;
 		currentLevelInfo.ScorePerRound = levels.levelInfo[i].ScorePerRound;
+		currentLevelInfo.TotalDropsPerLevel = levels.levelInfo[i].TotalDropsPerLevel;
 
 		UnityEngine.SceneManagement.SceneManager.LoadScene("scenes");
 		Debug.Log("in handle Click "+i.ToString());
@@ -67,6 +69,7 @@ static public LevelInfo currentLevelInfo = new LevelInfo();
  
         return targetFile.text;
 	}
+
 }
 
 [System.Serializable]
@@ -83,5 +86,6 @@ public class LevelDescriptions
 		public int  DropsPerRound;
 		public int ScorePerRound;
 		public string DropType;
+		public int TotalDropsPerLevel;
 
 	}
