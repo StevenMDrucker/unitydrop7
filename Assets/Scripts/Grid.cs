@@ -142,6 +142,10 @@ public class Grid : MonoBehaviour {
             scoretext.text = "";
             levelcounttext = LevelNo.GetComponent<UnityEngine.UI.Text>();
             DropIndicator = NumDropsIndicator.GetComponent<numDropIndicator>();
+            
+            LevelInfoNumDrops = Level.currentLevelInfo.DropsPerRound;
+
+
             DropIndicator.SetTotalDropNumber(LevelInfoNumDrops);
     }
     public bool AddBottomRow()
@@ -783,7 +787,7 @@ public class Grid : MonoBehaviour {
                 if (toRemove[row,col])
                 {
                     //                    Destroy(aPiece.gameObject);
-                    bool didRemove = ClearPiece(row, col, chainlevel);
+                    ClearPiece(row, col, chainlevel);
                     removed = true;
                 }
             }

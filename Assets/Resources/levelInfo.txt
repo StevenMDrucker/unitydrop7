@@ -1,0 +1,16 @@
+{
+    "levelInfo": [
+        {
+            "LevelType": "Score",
+            "DropsPerRound": 20,
+            "ScorePerRound": 15000,
+            "DropType": "NoEgg"
+        },
+        {
+            "LevelType": "ClearObstacles",
+            "DropsPerRound": 5,
+            "ScorePerRound": 5000,
+            "DropType": "All"
+        }
+    ]
+}
