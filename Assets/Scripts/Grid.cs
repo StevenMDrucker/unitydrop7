@@ -953,6 +953,15 @@ public class Grid : MonoBehaviour {
         }
     }  
 
+    public void redoLevel() {
+        
+        UnityEngine.SceneManagement.SceneManager.LoadScene("scenes");
+    }
+
+    public void nextLevel() {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("LoadScene");
+    }
+
 
     public void checkGameOver()
     {

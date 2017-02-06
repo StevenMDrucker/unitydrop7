@@ -15,7 +15,7 @@ public class Level : MonoBehaviour {
 
 
 static public LevelInfo currentLevelInfo = new LevelInfo();
-	GameObject[] leveObjectArray;
+	GameObject[] levelObjectArray;
 //	public Grid grid;
 	// Use this for initialization
 	void Start () {
@@ -23,14 +23,14 @@ static public LevelInfo currentLevelInfo = new LevelInfo();
 		levels = JsonUtility.FromJson<LevelDescriptions>(myText);
 
 
-		leveObjectArray= new GameObject[levels.levelInfo.Length];
+		levelObjectArray= new GameObject[levels.levelInfo.Length];
 		for (int i = 0; i<levels.levelInfo.Length; i++) {
 			int y = i % 15;
 			int x = i / 15;
 			GameObject newObject = (GameObject)Instantiate(levelButtonPrefab, new Vector2((float)x * 10.0f + 350.0f, -20.0f +  (float)y * -30.0f + 450.0f), Quaternion.identity);
 			//newObject.transform.localScale = new Vector2(0.2f,0.2f);
 			newObject.transform.SetParent(this.transform);
-			leveObjectArray[i]=newObject;
+			levelObjectArray[i]=newObject;
 
 
 			GameObject scoreText = newObject.transform.FindChild("Text").gameObject;
@@ -38,12 +38,18 @@ static public LevelInfo currentLevelInfo = new LevelInfo();
 
 			theButton.onClick.AddListener (() => {HandleClick(y);});
         	UnityEngine.UI.Text thetext = scoreText.GetComponent<UnityEngine.UI.Text>();
-			thetext.text = "Level " + i.ToString();
-		}
+			thetext.text = "Level " + i.ToString() + " Type: " + levels.levelInfo[i].DropType.ToString();
+ 		}
 	}
 	
 	public void HandleClick(int i)
 	{
+		Debug.Log("in handle Click "+i.ToString());
+		PlayLevel(i);
+	}
+
+	public void PlayLevel(int i) {
+	
 		currentLevelInfo.DropType = levels.levelInfo[i].DropType;
 		currentLevelInfo.DropsPerRound = levels.levelInfo[i].DropsPerRound;
 		currentLevelInfo.LevelType = levels.levelInfo[i].LevelType;
@@ -52,6 +58,7 @@ static public LevelInfo currentLevelInfo = new LevelInfo();
 
 		UnityEngine.SceneManagement.SceneManager.LoadScene("scenes");
 		Debug.Log("in handle Click "+i.ToString());
+
 	}
 
 	// Update is called once per frame
@@ -82,6 +89,7 @@ public class LevelDescriptions
 [System.Serializable]
 	public class LevelInfo
 	{
+		public int levelNo;
 		public string LevelType;
 		public int  DropsPerRound;
 		public int ScorePerRound;
