@@ -148,7 +148,7 @@ public class Grid : MonoBehaviour {
             if (Level.currentLevelInfo.TotalDropsPerLevel > 0) {
                 UIDisplayComponent.DropsLeftText = Level.currentLevelInfo.TotalDropsPerLevel.ToString();
             } else {
-                UIDisplayComponent.DropsLeftText = "";
+                UIDisplayComponent.DropsLeftText = "Unlimited";
             }        
             UIDisplayComponent.SetTotalDrops(Level.currentLevelInfo.DropsPerRound);
 
@@ -442,7 +442,7 @@ public class Grid : MonoBehaviour {
                 currentGameStats.currentDrop++;
                 if (Level.currentLevelInfo.TotalDropsPerLevel > 0) {
                     // this level counts how many rounds, so let's display how many left
-                    UIDisplayComponent.DropsLeftText = (Level.currentLevelInfo.TotalDropsPerLevel - currentGameStats.currentDrop).ToString() + " Drops Left";
+                    UIDisplayComponent.DropsLeftText = (Level.currentLevelInfo.TotalDropsPerLevel - currentGameStats.currentDrop).ToString();
                 }
                 // hide preview piece
                 nextPiece.gameObject.SetActive(false);
