@@ -145,7 +145,11 @@ public class Grid : MonoBehaviour {
     {            
             UIDisplayComponent = mainDisplay.GetComponent<UIDisplay>();
             
-            UIDisplayComponent.DropsLeftText = Level.currentLevelInfo.TotalDropsPerLevel.ToString();
+            if (Level.currentLevelInfo.TotalDropsPerLevel > 0) {
+                UIDisplayComponent.DropsLeftText = Level.currentLevelInfo.TotalDropsPerLevel.ToString();
+            } else {
+                UIDisplayComponent.DropsLeftText = "";
+            }        
             UIDisplayComponent.SetTotalDrops(Level.currentLevelInfo.DropsPerRound);
 
             currentGameStats.init();
@@ -435,9 +439,9 @@ public class Grid : MonoBehaviour {
             if (pieceBelow.Type == PieceType.EMPTY)
             {
                 currentGameStats.currentDropsPerRound++;
-                if (Level.currentLevelInfo.DropsPerRound > 0) {
+                currentGameStats.currentDrop++;
+                if (Level.currentLevelInfo.TotalDropsPerLevel > 0) {
                     // this level counts how many rounds, so let's display how many left
-                    currentGameStats.currentDrop++;
                     UIDisplayComponent.DropsLeftText = (Level.currentLevelInfo.TotalDropsPerLevel - currentGameStats.currentDrop).ToString() + " Drops Left";
                 }
                 // hide preview piece
@@ -842,6 +846,10 @@ public class Grid : MonoBehaviour {
         long score = 3L * chainlevel * chainlevel;
         return (score);
     }
+    public void DisplayScore(long score)
+    {
+        UIDisplayComponent.CurrentScoreText = currentGameStats.currentScore.ToString();
+    }
     public void AddScoreText(int x, int y, int colnumber, int chainLevel)
     {
         Color[] colorList = { Color.green, Color.yellow, new Color(1.0f, 0.6f, 0.0f), Color.red, new Color(0.5f, 0.0f, 0.5f), Color.cyan, Color.blue, Color.gray, Color.gray };
@@ -852,7 +860,7 @@ public class Grid : MonoBehaviour {
         currentGameStats.currentScore += localScore;
         thetext.text = localScore.ToString();
         thetext.color = colorList[colnumber - 1];
-        UIDisplayComponent.CurrentScoreText = currentGameStats.currentScore.ToString();
+        DisplayScore(currentGameStats.currentScore);
 
         if (chainLevel > 1) {
             UIDisplayComponent.ChainNumberText = "Chain x" + chainLevel.ToString();
@@ -943,7 +951,7 @@ public class Grid : MonoBehaviour {
                             }
                             else if (neighborPiece.ColorComponent.Color == ColorPiece.ColorType.EGGCRACKED)
                             {
-//                                neighborPiece.ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, nextPiece.ColorComponent.NumColors - 2));
+
                                 neighborPiece.ColorComponent.SetColor(neighborPiece.ColorComponent.HiddenColor);
                             }
                         }
@@ -965,17 +973,31 @@ public class Grid : MonoBehaviour {
 
     public void checkGameOver()
     {
-        // you should check to see based on game type too
+        // TODO:  you should check to see based on game type too
         if (Level.currentLevelInfo.TotalDropsPerLevel > 0) {
             if (currentGameStats.currentDrop >= Level.currentLevelInfo.TotalDropsPerLevel) {
                 gameOver();
             }
         }
+
+        if (Level.currentLevelInfo.LevelType == "ClearObsctacles") {
+
+        }
     }  
+
+    public bool checkForWin() {
+        // TODO:  this is where we should evaluate whether we won the game or not
+        return(true);
+    }
     
     public void gameOver()
     {
+        // TODO: we should change the game over dialog to be win or lose based on result
         mode = InteractMode.GAMEOVER;
-        UIDisplayComponent.showGameOver();   
+        if (checkForWin()) {
+            UIDisplayComponent.showGameOver();           
+        } else {
+            UIDisplayComponent.showGameOver();   
+        }
     }
 }

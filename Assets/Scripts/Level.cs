@@ -9,19 +9,23 @@ public class Level : MonoBehaviour {
 	};
 
 	public LevelDescriptions levels;
-
+	public bool[] LockedLevels;
 	
 	public GameObject levelButtonPrefab;
 
 
-static public LevelInfo currentLevelInfo = new LevelInfo();
+	static public LevelInfo currentLevelInfo = new LevelInfo();
 	GameObject[] levelObjectArray;
 //	public Grid grid;
 	// Use this for initialization
 	void Start () {
 		string myText = LoadResourceTextfile("levelInfo");
 		levels = JsonUtility.FromJson<LevelDescriptions>(myText);
-
+		LockedLevels = new bool[levels.levelInfo.Length];
+		//TODO: keep track of locked levels, for now, make them all unlocked
+		for (int i=0; i<levels.levelInfo.Length; i++) {
+			LockedLevels[i] = false;
+		}
 
 		levelObjectArray= new GameObject[levels.levelInfo.Length];
 		for (int i = 0; i<levels.levelInfo.Length; i++) {
@@ -39,12 +43,12 @@ static public LevelInfo currentLevelInfo = new LevelInfo();
 			theButton.onClick.AddListener (() => {HandleClick(y);});
         	UnityEngine.UI.Text thetext = scoreText.GetComponent<UnityEngine.UI.Text>();
 			thetext.text = "Level " + i.ToString() + " Type: " + levels.levelInfo[i].DropType.ToString();
+			// TODO SHOW WHICH LEVELS ARE LOCKED OR NOT!
  		}
 	}
 	
 	public void HandleClick(int i)
 	{
-		Debug.Log("in handle Click "+i.ToString());
 		PlayLevel(i);
 	}
 
@@ -55,9 +59,8 @@ static public LevelInfo currentLevelInfo = new LevelInfo();
 		currentLevelInfo.LevelType = levels.levelInfo[i].LevelType;
 		currentLevelInfo.ScorePerRound = levels.levelInfo[i].ScorePerRound;
 		currentLevelInfo.TotalDropsPerLevel = levels.levelInfo[i].TotalDropsPerLevel;
-
+		currentLevelInfo.StarScores = levels.levelInfo[i].StarScores;
 		UnityEngine.SceneManagement.SceneManager.LoadScene("scenes");
-		Debug.Log("in handle Click "+i.ToString());
 
 	}
 
@@ -94,6 +97,7 @@ public class LevelDescriptions
 		public int  DropsPerRound;
 		public int ScorePerRound;
 		public string DropType;
+		public long [] StarScores;
 		public int TotalDropsPerLevel;
 
 	}
