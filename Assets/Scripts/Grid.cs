@@ -72,10 +72,10 @@ public class Grid : MonoBehaviour {
     
 
     private GamePiece nextPiece;
-    private Dictionary<PieceType, GameObject> piecePrefabDict;
+    protected Dictionary<PieceType, GameObject> piecePrefabDict;
 
-    private GamePiece[,] pieces;
-    private BackgroundPiece[,] backgroundPieces;
+    protected GamePiece[,] pieces;
+    protected BackgroundPiece[,] backgroundPieces;
     private bool isFilling = false;
     private bool isUpdating = false;
     private float ChainFadeSpeed = 2.0f;
@@ -144,14 +144,14 @@ public class Grid : MonoBehaviour {
     void Awake()
     {            
             UIDisplayComponent = mainDisplay.GetComponent<UIDisplay>();
-            
-            if (Level.currentLevelInfo.TotalDropsPerLevel > 0) {
-                UIDisplayComponent.DropsLeftText = Level.currentLevelInfo.TotalDropsPerLevel.ToString();
-            } else {
-                UIDisplayComponent.DropsLeftText = "Unlimited";
-            }        
-            UIDisplayComponent.SetTotalDrops(Level.currentLevelInfo.DropsPerRound);
-
+            if (UIDisplayComponent) {
+                if (Level.currentLevelInfo.TotalDropsPerLevel > 0) {
+                    UIDisplayComponent.DropsLeftText = Level.currentLevelInfo.TotalDropsPerLevel.ToString();
+                } else {
+                    UIDisplayComponent.DropsLeftText = "Unlimited";
+                }        
+                UIDisplayComponent.SetTotalDrops(Level.currentLevelInfo.DropsPerRound);
+            }
             currentGameStats.init();
             
     }
@@ -401,7 +401,7 @@ public class Grid : MonoBehaviour {
         }
         isUpdating = false;
     }
-    public void handleMouseDown(int x, int y)
+    public virtual void handleMouseDown(int x, int y)
     {
         if (mode==InteractMode.HAMMER) {
             // delete element
@@ -418,7 +418,7 @@ public class Grid : MonoBehaviour {
         }
     }
 
-    public void handleMouseEnter(int x, int y)
+    public virtual void handleMouseEnter(int x, int y)
     {
         if (mode == InteractMode.HAMMER) {
             hammer.transform.position = GetWorldPosition(x,y);
@@ -462,7 +462,11 @@ public class Grid : MonoBehaviour {
         }
     }
 
-
+    public void startUpdate()
+    {
+        currentGameStats.currentDropsPerRound = -1;
+        StartCoroutine(fillAndUpdate(0));
+    }
 
     public IEnumerator fillAndUpdate(int cl) {
         if (cl > currentGameStats.maxChainLevel) {
@@ -476,8 +480,9 @@ public class Grid : MonoBehaviour {
             currentGameStats.currentDropsPerRound = 0;
             StartCoroutine(addRow(cl));
         } 
-        UIDisplayComponent.SetDropCount(Level.currentLevelInfo.DropsPerRound - currentGameStats.currentDropsPerRound -1 );
-
+        if (UIDisplayComponent) {
+            UIDisplayComponent.SetDropCount(Level.currentLevelInfo.DropsPerRound - currentGameStats.currentDropsPerRound -1 );
+        }
         checkGameOver();
         isUpdating = false;
     }
@@ -848,7 +853,9 @@ public class Grid : MonoBehaviour {
     }
     public void DisplayScore(long score)
     {
-        UIDisplayComponent.CurrentScoreText = currentGameStats.currentScore.ToString();
+        if (UIDisplayComponent) {
+            UIDisplayComponent.CurrentScoreText = currentGameStats.currentScore.ToString();
+        }
     }
     public void AddScoreText(int x, int y, int colnumber, int chainLevel)
     {
@@ -863,8 +870,10 @@ public class Grid : MonoBehaviour {
         DisplayScore(currentGameStats.currentScore);
 
         if (chainLevel > 1) {
-            UIDisplayComponent.ChainNumberText = "Chain x" + chainLevel.ToString();
-            UIDisplayComponent.CrossFadeLevelText(1.0f, 0.05f);
+            if (UIDisplayComponent) {
+                UIDisplayComponent.ChainNumberText = "Chain x" + chainLevel.ToString();
+                UIDisplayComponent.CrossFadeLevelText(1.0f, 0.05f);
+            }
         }
 
         newObject.transform.SetParent(transform);
@@ -905,8 +914,10 @@ public class Grid : MonoBehaviour {
             cl++;
             StartCoroutine(Fill());
         }
-        nextPiece.gameObject.SetActive(true);
-        UIDisplayComponent.CrossFadeLevelText(0.0f, ChainFadeSpeed);
+        if (nextPiece) nextPiece.gameObject.SetActive(true);
+        if (UIDisplayComponent) {
+            UIDisplayComponent.CrossFadeLevelText(0.0f, ChainFadeSpeed);
+        }
     }
 
     private List<Tuple> getNeighborList(int x, int y)
@@ -993,11 +1004,13 @@ public class Grid : MonoBehaviour {
     public void gameOver()
     {
         // TODO: we should change the game over dialog to be win or lose based on result
-        mode = InteractMode.GAMEOVER;
-        if (checkForWin()) {
-            UIDisplayComponent.showGameOver();           
-        } else {
-            UIDisplayComponent.showGameOver();   
+        if (UIDisplayComponent) {
+            mode = InteractMode.GAMEOVER;
+            if (checkForWin()) {
+                UIDisplayComponent.showGameOver();           
+            } else {
+                UIDisplayComponent.showGameOver();   
+            }
         }
     }
 }
