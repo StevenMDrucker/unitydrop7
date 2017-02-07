@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
+using System.IO;
 public class LevelDesignGrid : Grid {
   
   
@@ -12,6 +12,7 @@ public class LevelDesignGrid : Grid {
 	private int currentPiece =0;
 
 	public GamePiece previewPiece;
+    public InputField LevelNumber;
 
 	// Use this for initialization
   void Start()
@@ -35,10 +36,6 @@ public class LevelDesignGrid : Grid {
                 backgroundPieces[x, y] =  newObject.GetComponent<BackgroundPiece>();
                 backgroundPieces[x, y].Init(x, y, this);
                 backgroundPieces[x, y].transform.parent = transform;
-                /*
-                SpriteRenderer aRender = backgroundPieces[x, y].GetComponent<SpriteRenderer>();
-                Color newColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
-                aRender.color = newColor;*/
             }
         }
 
@@ -50,26 +47,12 @@ public class LevelDesignGrid : Grid {
                 SpawnNewPiece(x, y, PieceType.EMPTY);
             }
         }
-        
-        
-  
 
-    }
-
-
-    public new void HighlightPiece(int row, int col)
-    {
-    }
-    public new void  unHighlightPiece(int row, int col)
-    {
-    }
-    public new void highlightColumn(int xcol)
-    {     
     }
 
 	public override void handleMouseDown(int x, int y)
     {
-		GamePiece thePiece = pieces[x,y];
+//		GamePiece thePiece = pieces[x,y];
 
 		if (currentPiece == 0) {
 			ClearPiece(x,y,0);
@@ -114,7 +97,54 @@ public class LevelDesignGrid : Grid {
 		
 	}
 
+    public void saveLevel()
+    {
+        // get the levelNumber from InputField
+        string levelName = LevelNumber.text;
+        TextWriter tw = new StreamWriter(Application.persistentDataPath + "/levelInfo."+levelName);
+       
+        for (int x=0;x<xDim; x++) {
+            for (int y=0; y<yDim; y++) {
+                if (pieces[x,y].Type == PieceType.EMPTY) {
+                    tw.Write(0);
+                } else {
+                    tw.Write(pieces[x,y].GetColorNumber());
+                }
+                if ((x < xDim) || (y < yDim)) {
+                    tw.Write(",");
+                }
+            }
+        }
+        tw.Flush();
+        tw.Close();
 
+    }
+
+    public void loadLevel()
+    { 
+        string levelName = LevelNumber.text;
+        string astring = null;
+        if (File.Exists( Application.persistentDataPath + "/levelInfo."+levelName)) {
+            TextReader tr = new StreamReader(Application.persistentDataPath + "/levelInfo."+levelName);
+            astring = tr.ReadToEnd();
+        }
+        if (astring != null) {
+            string [] splitstring = astring.Split(',');
+
+            for (int i = 0; i< splitstring.Length-1;i++) {
+                ClearPiece(i / 7, i %7, 0);
+                if (splitstring[i] == "0") {
+                    SpawnNewPiece(i / 7, i%7, PieceType.EMPTY);
+                } else {
+                    int pieceNum = int.Parse(splitstring[i]);
+                    GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
+                    aPiece.ColorComponent.SetColor((ColorPiece.ColorType)pieceNum-1);                     
+                }
+            }
+
+
+        }
+    }
 	
 
 }
