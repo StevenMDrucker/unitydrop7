@@ -2020,7 +2020,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1717789324}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1872687739}
+        m_MethodName: saveLevel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1717789324
@@ -2475,6 +2486,7 @@ MonoBehaviour:
   hammerPrefab: {fileID: 0}
   bombPrefab: {fileID: 0}
   previewPiece: {fileID: 724155826}
+  LevelNumber: {fileID: 1796669312}
 --- !u!1 &1930250969
 GameObject:
   m_ObjectHideFlags: 0
@@ -2624,7 +2636,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2080209540}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1872687739}
+        m_MethodName: loadLevel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &2080209540

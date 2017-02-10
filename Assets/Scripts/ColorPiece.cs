@@ -42,6 +42,7 @@ public class ColorPiece : MonoBehaviour {
 
 	private ColorType hiddenColor;
 	public ColorType HiddenColor{
+		set {hiddenColor = value;}
 		get {return hiddenColor;}
 	}
 
@@ -79,8 +80,12 @@ public class ColorPiece : MonoBehaviour {
 			sprite.sprite = colorSpriteDict [newColor];
 		}
 
+/*
 		if (newColor == ColorType.EGG) {
 			hiddenColor = (ColorPiece.ColorType)Random.Range(0, NumColors - 2);
+		} else if (newColor == ColorType.EGGCRACKED) {
+			hiddenColor = (ColorPiece.ColorType)Random.Range(0, NumColors - 2);
 		}
+*/	
 	}
 }

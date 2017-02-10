@@ -129,6 +129,8 @@ public class Grid : MonoBehaviour {
         nextPiece = nPiece.GetComponent<GamePiece>();
         nextPiece.Init(3, -1, this, PieceType.NORMAL);
         nextPiece.ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, nextPiece.ColorComponent.NumColors - 1));
+        nextPiece.ColorComponent.HiddenColor = ((ColorPiece.ColorType)Random.Range(0, nextPiece.ColorComponent.NumColors - 2));
+        
 
         hammer = (GameObject)Instantiate(hammerPrefab, GetWorldPosition(3, -1), Quaternion.identity);
         hammer.transform.parent = transform;

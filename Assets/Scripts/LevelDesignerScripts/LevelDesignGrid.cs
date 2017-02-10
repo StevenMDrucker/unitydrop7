@@ -52,17 +52,28 @@ public class LevelDesignGrid : Grid {
 
 	public override void handleMouseDown(int x, int y)
     {
-//		GamePiece thePiece = pieces[x,y];
+		GamePiece thePiece = pieces[x,y];
+        int colorno = 0; 
+        if (thePiece.Type == PieceType.NORMAL) {
+            colorno = thePiece.GetColorNumber();
+        }
 
-		if (currentPiece == 0) {
-			ClearPiece(x,y,0);
-		} else {
-			ClearPiece(x,y,0);
+        ClearPiece(x,y,0);
+		if (currentPiece != 0) {
+			// for not empty pieces, do this:
+            ClearPiece(x,y,0);
 			GameObject newPiece = (GameObject)Instantiate(piecePrefabDict[PieceType.NORMAL], GetWorldPosition(x, y), Quaternion.identity);
         	newPiece.transform.parent = transform;
 			pieces[x, y] = newPiece.GetComponent<GamePiece>();
 			pieces[x, y].Init(x, y, this, PieceType.NORMAL);
 			pieces[x, y].ColorComponent.SetColor((ColorPiece.ColorType)currentPiece-1);
+            if (colorno != 0 && colorno != 8 && colorno != 9) {
+                if (currentPiece == 8 || currentPiece == 9) {
+                    pieces[x,y].ColorComponent.HiddenColor = (ColorPiece.ColorType)colorno-1;
+                }
+            } else {
+                pieces[x,y].ColorComponent.HiddenColor = ((ColorPiece.ColorType)Random.Range(0, pieces[x,y].ColorComponent.NumColors - 2));
+            }
 		}
 
     }
@@ -108,7 +119,14 @@ public class LevelDesignGrid : Grid {
                 if (pieces[x,y].Type == PieceType.EMPTY) {
                     tw.Write(0);
                 } else {
-                    tw.Write(pieces[x,y].GetColorNumber());
+                    int colno = pieces[x,y].GetColorNumber();
+                    if (colno == 8) {
+                        tw.Write(10 + (int)(pieces[x,y].ColorComponent.HiddenColor+1));
+                    } else if (colno == 9) {
+                        tw.Write(20 + (int)(pieces[x,y].ColorComponent.HiddenColor+1));
+                    } else {
+                        tw.Write(colno);
+                    }
                 }
                 if ((x < xDim) || (y < yDim)) {
                     tw.Write(",");
@@ -137,11 +155,24 @@ public class LevelDesignGrid : Grid {
                     SpawnNewPiece(i / 7, i%7, PieceType.EMPTY);
                 } else {
                     int pieceNum = int.Parse(splitstring[i]);
-                    GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
-                    aPiece.ColorComponent.SetColor((ColorPiece.ColorType)pieceNum-1);                     
+                    if (pieceNum > 20) {
+                        int pieceColor = pieceNum % 10;
+                        GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
+                        aPiece.ColorComponent.SetColor(ColorPiece.ColorType.EGGCRACKED);
+                        aPiece.ColorComponent.HiddenColor = ((ColorPiece.ColorType)pieceColor-1);
+                    } else if (pieceNum > 10) {
+                        int pieceColor = pieceNum % 10;
+                        GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
+                        aPiece.ColorComponent.SetColor(ColorPiece.ColorType.EGG);
+                        aPiece.ColorComponent.HiddenColor = ((ColorPiece.ColorType)pieceColor-1);
+                    } else {
+                        int pieceColor = pieceNum % 10;
+                        GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
+                        aPiece.ColorComponent.SetColor((ColorPiece.ColorType)pieceColor-1);
+                        aPiece.ColorComponent.HiddenColor = (ColorPiece.ColorType)Random.Range(0, 7);
+                    }
                 }
             }
-
 
         }
     }
