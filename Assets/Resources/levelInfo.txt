@@ -7,25 +7,54 @@
             "ScorePerRound": 15000,
             "TotalDropsPerLevel": -1,
             "StarScores": [100, 500, 1000],
-            "DropType": "NoEgg"
+            "Description": "Infinite drops, 5 drops per round, no egg drop",
+            "DropType": "NoEgg",
+            "AssociatedBoard": ""
         },
         {
             "levelNo": 1,
-            "LevelType": "ClearObstacles",
-            "DropsPerRound": 5,
+            "LevelType": "Score",
+            "DropsPerRound": 15,
             "ScorePerRound": 5000,
             "TotalDropsPerLevel": -1,
             "StarScores": [100, 500, 1000],
-            "DropType": "All"
+            "Description": "Infinite drops, 5 drops per round",
+            "DropType": "All",
+            "AssociatedBoard": ""
         },
         {
             "levelNo": 2,
-            "LevelType": "ClearObstacles",
+            "LevelType": "Score",
             "DropsPerRound": 5,
             "ScorePerRound": 5000,
             "TotalDropsPerLevel": 8,
             "StarScores": [100, 500, 1000],
-            "DropType": "All"
+            "Description": "8 drops, 5 drops per round, no egg drop",
+            "DropType": "NoEgg",
+            "AssociatedBoard": ""            
+        },
+        {
+            "levelNo": 3,
+            "LevelType": "Score",
+            "DropsPerRound": 5,
+            "ScorePerRound": 5000,
+            "TotalDropsPerLevel": 8,
+            "StarScores": [100, 500, 1000],
+            "Description": "8 drops, 5 drops per round, no egg drop",
+            "DropType": "NoEgg",
+            "AssociatedBoard": ""
+        },
+        {
+            "levelNo": 4,
+            "LevelType": "Score",
+            "DropsPerRound": 5,
+            "ScorePerRound": 5000,
+            "TotalDropsPerLevel": 8,
+            "StarScores": [100, 500, 1000],
+            "Description": "8 drops, 5 drops per round, no egg drop, starting board",
+            "DropType": "NoEgg",
+            "AssociatedBoard": "2"
         }
+
     ]
 }
