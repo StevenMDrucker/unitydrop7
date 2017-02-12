@@ -159,6 +159,14 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 8deec89d69efd7f4c8878e570f577c15, type: 3}
   - color: 8
     sprite: {fileID: 21300000, guid: 633a6d65947caed40a3d30d56a291fea, type: 3}
+  - color: 9
+    sprite: {fileID: 21300000, guid: 0436118f21272e04bbef02fe9e25f582, type: 3}
+  - color: 10
+    sprite: {fileID: 21300000, guid: d645cdb9db4bf324ea030d3285d3af26, type: 3}
+  - color: 11
+    sprite: {fileID: 21300000, guid: 2383f5adf20cb0a4ea2903d5fe02d8ab, type: 3}
+  - color: 11
+    sprite: {fileID: 21300000, guid: 633a6d65947caed40a3d30d56a291fea, type: 3}
 --- !u!114 &114782296065077812
 MonoBehaviour:
   m_ObjectHideFlags: 1

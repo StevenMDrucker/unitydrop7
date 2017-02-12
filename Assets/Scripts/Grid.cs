@@ -861,7 +861,7 @@ public class Grid : MonoBehaviour {
     }
     public void AddScoreText(int x, int y, int colnumber, int chainLevel)
     {
-        Color[] colorList = { Color.green, Color.yellow, new Color(1.0f, 0.6f, 0.0f), Color.red, new Color(0.5f, 0.0f, 0.5f), Color.cyan, Color.blue, Color.gray, Color.gray };
+        Color[] colorList = { Color.green, Color.yellow, new Color(1.0f, 0.6f, 0.0f), Color.red, new Color(0.5f, 0.0f, 0.5f), Color.cyan, Color.blue, Color.gray, Color.gray, Color.gray, Color.gray };
         GameObject newObject = (GameObject)Instantiate(scorePrefab, GetWorldPosition((float)x+1.5f, (float)y-.5f), Quaternion.identity);
         GameObject scoreText = newObject.transform.FindChild("Text").gameObject;
         UnityEngine.UI.Text thetext = scoreText.GetComponent<UnityEngine.UI.Text>();
@@ -967,6 +967,20 @@ public class Grid : MonoBehaviour {
 
                                 neighborPiece.ColorComponent.SetColor(neighborPiece.ColorComponent.HiddenColor);
                             }
+                            else if (neighborPiece.ColorComponent.Color == ColorPiece.ColorType.BARRIER)
+                            {
+                                neighborPiece.ColorComponent.SetColor(ColorPiece.ColorType.BARRIERCRACKED);
+                            }
+                            else if (neighborPiece.ColorComponent.Color == ColorPiece.ColorType.BARRIERCRACKED)
+                            {
+                                neighborPiece.ColorComponent.SetColor(ColorPiece.ColorType.SAND);
+                            }
+                            else if (neighborPiece.ColorComponent.Color == ColorPiece.ColorType.SAND)
+                            {
+                                ClearPiece(aNeighbor.x, aNeighbor.y,0);
+                            }
+
+
                         }
                     }
                 }

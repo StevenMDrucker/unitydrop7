@@ -15,6 +15,9 @@ public class ColorPiece : MonoBehaviour {
         SEVEN,
         EGG,
         EGGCRACKED,
+		BARRIER,
+		BARRIERCRACKED,
+		SAND,
         COUNT
     };
 
