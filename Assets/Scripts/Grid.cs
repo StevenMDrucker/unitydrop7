@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
 public struct Tuple
 {
     public int x, y;
@@ -105,10 +106,7 @@ public class Grid : MonoBehaviour {
                 backgroundPieces[x, y] =  newObject.GetComponent<BackgroundPiece>();
                 backgroundPieces[x, y].Init(x, y, this);
                 backgroundPieces[x, y].transform.parent = transform;
-                /*
-                SpriteRenderer aRender = backgroundPieces[x, y].GetComponent<SpriteRenderer>();
-                Color newColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
-                aRender.color = newColor;*/
+
             }
         }
 
@@ -121,8 +119,6 @@ public class Grid : MonoBehaviour {
             }
         }
         
-        
-        StartCoroutine(Fill());
 
         GameObject nPiece = (GameObject)Instantiate(piecePrefabDict[PieceType.NORMAL], GetWorldPosition(3, -1), Quaternion.identity);
         nPiece.transform.parent = transform;
@@ -140,6 +136,10 @@ public class Grid : MonoBehaviour {
         bomb.transform.parent = transform;
         bomb.SetActive(false);
 
+         if (Level.currentLevelInfo.AssociatedBoard != "") {
+                load(Level.currentLevelInfo.AssociatedBoard);
+            }
+        startUpdate();
     }
 
 
@@ -155,7 +155,7 @@ public class Grid : MonoBehaviour {
                 UIDisplayComponent.SetTotalDrops(Level.currentLevelInfo.DropsPerRound);
             }
             currentGameStats.init();
-            
+              
     }
     public bool AddBottomRow()
     {
@@ -1027,6 +1027,45 @@ public class Grid : MonoBehaviour {
             } else {
                 UIDisplayComponent.showGameOver();   
             }
+        }
+    }
+
+
+    public void load(string levelName)
+    {         
+        string astring = null;
+        if (File.Exists( Application.persistentDataPath + "/levelInfo."+levelName)) {
+            TextReader tr = new StreamReader(Application.persistentDataPath + "/levelInfo."+levelName);
+            astring = tr.ReadToEnd();
+        }
+        if (astring != null) {
+            string [] splitstring = astring.Split(',');
+
+            for (int i = 0; i< splitstring.Length-1;i++) {
+                ClearPiece(i / 7, i %7, 0);
+                if (splitstring[i] == "0") {
+                    SpawnNewPiece(i / 7, i%7, PieceType.EMPTY);
+                } else {
+                    int pieceNum = int.Parse(splitstring[i]);
+                    if (pieceNum > 20) {
+                        int pieceColor = pieceNum % 10;
+                        GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
+                        aPiece.ColorComponent.SetColor(ColorPiece.ColorType.EGGCRACKED);
+                        aPiece.ColorComponent.HiddenColor = ((ColorPiece.ColorType)pieceColor-1);
+                    } else if (pieceNum > 10) {
+                        int pieceColor = pieceNum % 10;
+                        GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
+                        aPiece.ColorComponent.SetColor(ColorPiece.ColorType.EGG);
+                        aPiece.ColorComponent.HiddenColor = ((ColorPiece.ColorType)pieceColor-1);
+                    } else {
+                        int pieceColor = pieceNum % 10;
+                        GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
+                        aPiece.ColorComponent.SetColor((ColorPiece.ColorType)pieceColor-1);
+                        aPiece.ColorComponent.HiddenColor = (ColorPiece.ColorType)Random.Range(0, 7);
+                    }
+                }
+            }
+
         }
     }
 }

@@ -42,7 +42,7 @@ public class Level : MonoBehaviour {
 
 			theButton.onClick.AddListener (() => {HandleClick(y);});
         	UnityEngine.UI.Text thetext = scoreText.GetComponent<UnityEngine.UI.Text>();
-			thetext.text = "Level " + i.ToString() + " Type: " + levels.levelInfo[i].DropType.ToString();
+			thetext.text = "Level " + i.ToString() + " Description: " + levels.levelInfo[i].Description;
 			// TODO SHOW WHICH LEVELS ARE LOCKED OR NOT!
  		}
 	}
@@ -60,6 +60,8 @@ public class Level : MonoBehaviour {
 		currentLevelInfo.ScorePerRound = levels.levelInfo[i].ScorePerRound;
 		currentLevelInfo.TotalDropsPerLevel = levels.levelInfo[i].TotalDropsPerLevel;
 		currentLevelInfo.StarScores = levels.levelInfo[i].StarScores;
+		currentLevelInfo.Description = levels.levelInfo[i].Description;
+		currentLevelInfo.AssociatedBoard = levels.levelInfo[i].AssociatedBoard;
 		UnityEngine.SceneManagement.SceneManager.LoadScene("scenes");
 
 	}
@@ -94,10 +96,12 @@ public class LevelDescriptions
 	{
 		public int levelNo;
 		public string LevelType;
+		public string Description;
 		public int  DropsPerRound;
 		public int ScorePerRound;
 		public string DropType;
 		public long [] StarScores;
 		public int TotalDropsPerLevel;
+		public string AssociatedBoard;
 
 	}

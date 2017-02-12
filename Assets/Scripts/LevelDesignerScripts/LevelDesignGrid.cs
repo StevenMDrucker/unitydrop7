@@ -140,41 +140,10 @@ public class LevelDesignGrid : Grid {
 
     public void loadLevel()
     { 
+
+
         string levelName = LevelNumber.text;
-        string astring = null;
-        if (File.Exists( Application.persistentDataPath + "/levelInfo."+levelName)) {
-            TextReader tr = new StreamReader(Application.persistentDataPath + "/levelInfo."+levelName);
-            astring = tr.ReadToEnd();
-        }
-        if (astring != null) {
-            string [] splitstring = astring.Split(',');
-
-            for (int i = 0; i< splitstring.Length-1;i++) {
-                ClearPiece(i / 7, i %7, 0);
-                if (splitstring[i] == "0") {
-                    SpawnNewPiece(i / 7, i%7, PieceType.EMPTY);
-                } else {
-                    int pieceNum = int.Parse(splitstring[i]);
-                    if (pieceNum > 200) {
-                        int pieceColor = pieceNum % 100;
-                        GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
-                        aPiece.ColorComponent.SetColor(ColorPiece.ColorType.EGGCRACKED);
-                        aPiece.ColorComponent.HiddenColor = ((ColorPiece.ColorType)pieceColor-1);
-                    } else if (pieceNum > 100) {
-                        int pieceColor = pieceNum % 100;
-                        GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
-                        aPiece.ColorComponent.SetColor(ColorPiece.ColorType.EGG);
-                        aPiece.ColorComponent.HiddenColor = ((ColorPiece.ColorType)pieceColor-1);
-                    } else {
-                        int pieceColor = pieceNum % 100;
-                        GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
-                        aPiece.ColorComponent.SetColor((ColorPiece.ColorType)pieceColor-1);
-                        aPiece.ColorComponent.HiddenColor = (ColorPiece.ColorType)Random.Range(0, 7);
-                    }
-                }
-            }
-
-        }
+        this.load(levelName);
     }
 	
 
