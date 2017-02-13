@@ -1006,6 +1006,19 @@ public class Grid : MonoBehaviour {
     public void checkGameOver()
     {
         // TODO:  you should check to see based on game type too
+        // check to see if board is full
+        bool hasEmpty = false;
+        for (int x = 0;x<7;x++) {
+            GamePiece pieceBelow = pieces[x, 0];
+            if (pieceBelow.Type == PieceType.EMPTY) {
+                hasEmpty = true;
+            }
+        }
+        if (!hasEmpty) {
+            gameOver();
+        }
+
+
         if (Level.currentLevelInfo.TotalDropsPerLevel > 0) {
             if (currentGameStats.currentDrop >= Level.currentLevelInfo.TotalDropsPerLevel) {
                 gameOver();

@@ -85,6 +85,10 @@ public class Level : MonoBehaviour {
 
 	}
 
+	public void toLevelDesigner()
+	{
+		UnityEngine.SceneManagement.SceneManager.LoadScene("LevelDesigner");
+	}
 	// Update is called once per frame
 	void Update () {
 		
