@@ -866,7 +866,7 @@ public class Grid : MonoBehaviour {
     }
     public void AddScoreText(int x, int y, int colnumber, int chainLevel)
     {
-        Color[] colorList = { Color.green, Color.yellow, new Color(1.0f, 0.6f, 0.0f), Color.red, new Color(0.5f, 0.0f, 0.5f), Color.cyan, Color.blue, Color.gray, Color.gray, Color.gray, Color.gray };
+        Color[] colorList = { Color.green, Color.yellow, new Color(1.0f, 0.6f, 0.0f), Color.red, new Color(0.5f, 0.0f, 0.5f), Color.cyan, Color.blue, Color.gray, Color.gray, Color.gray, Color.gray, Color.gray };
         GameObject newObject = (GameObject)Instantiate(scorePrefab, GetWorldPosition((float)x+1.5f, (float)y-.5f), Quaternion.identity);
         GameObject scoreText = newObject.transform.FindChild("Text").gameObject;
         UnityEngine.UI.Text thetext = scoreText.GetComponent<UnityEngine.UI.Text>();
@@ -1065,18 +1065,18 @@ public class Grid : MonoBehaviour {
                     SpawnNewPiece(i / 7, i%7, PieceType.EMPTY);
                 } else {
                     int pieceNum = int.Parse(splitstring[i]);
-                    if (pieceNum > 20) {
-                        int pieceColor = pieceNum % 10;
+                    if (pieceNum > 200) {
+                        int pieceColor = pieceNum % 100;
                         GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
                         aPiece.ColorComponent.SetColor(ColorPiece.ColorType.EGGCRACKED);
                         aPiece.ColorComponent.HiddenColor = ((ColorPiece.ColorType)pieceColor-1);
-                    } else if (pieceNum > 10) {
-                        int pieceColor = pieceNum % 10;
+                    } else if (pieceNum > 100) {
+                        int pieceColor = pieceNum % 100;
                         GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
                         aPiece.ColorComponent.SetColor(ColorPiece.ColorType.EGG);
                         aPiece.ColorComponent.HiddenColor = ((ColorPiece.ColorType)pieceColor-1);
                     } else {
-                        int pieceColor = pieceNum % 10;
+                        int pieceColor = pieceNum % 100;
                         GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
                         aPiece.ColorComponent.SetColor((ColorPiece.ColorType)pieceColor-1);
                         aPiece.ColorComponent.HiddenColor = (ColorPiece.ColorType)Random.Range(0, 7);
