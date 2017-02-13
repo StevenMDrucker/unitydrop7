@@ -13,6 +13,14 @@ public class LevelDesignGrid : Grid {
 
 	public GamePiece previewPiece;
     public InputField LevelNumber;
+    public InputField boardName;
+    public InputField LevelType;
+    public InputField Description;
+    public InputField DropsPerRound;
+    public InputField ScorePerRound;
+    public InputField StarScores;
+    public InputField TotalDropsPerLevel;
+    public InputField AssociatedBoard;
 
 	// Use this for initialization
   void Start()
@@ -108,11 +116,64 @@ public class LevelDesignGrid : Grid {
 		
 	}
 
+    public void save()
+    {
+        saveLevel();
+        saveBoard();
+    }
+
     public void saveLevel()
     {
+        LevelInfo aLevel = new LevelInfo();
+        aLevel.AssociatedBoard = AssociatedBoard.text;
+        aLevel.Description = Description.text;
+        aLevel.DropsPerRound = int.Parse( DropsPerRound.text);
+        aLevel.levelNo = int.Parse(LevelNumber.text);
+        aLevel.LevelType = LevelType.text;
+        aLevel.DropType = "";
+        aLevel.StarScores = new long[3];
+        aLevel.StarScores[0] = 100L;
+        aLevel.StarScores[1] = 200L;
+        aLevel.StarScores[2] = 300L;
+//        aLevel.StarScores = StarScores.text;
+        aLevel.ScorePerRound = int.Parse(ScorePerRound.text);
+        string jsonLevel = JsonUtility.ToJson(aLevel);
+        TextWriter tw = new StreamWriter(Application.persistentDataPath + "/level."+aLevel.levelNo.ToString());
+        tw.Write(jsonLevel);
+        tw.Flush();
+        tw.Close();
+        
+    }
+
+    public void playLevel()
+    {
+        LevelInfo aLevel = new LevelInfo();
+        aLevel.AssociatedBoard = AssociatedBoard.text;
+        aLevel.Description = Description.text;
+    
+        aLevel.DropsPerRound = int.Parse( DropsPerRound.text);
+        aLevel.levelNo = int.Parse(LevelNumber.text);
+        aLevel.LevelType = LevelType.text;
+        aLevel.StarScores = new long[3];
+        aLevel.StarScores[0] = 100L;
+        aLevel.StarScores[1] = 200L;
+        aLevel.StarScores[2] = 300L;
+
+    	Level.currentLevelInfo.DropType = aLevel.DropType;
+		Level.currentLevelInfo.DropsPerRound = aLevel.DropsPerRound;
+		Level.currentLevelInfo.LevelType = aLevel.LevelType;
+		Level.currentLevelInfo.ScorePerRound = aLevel.ScorePerRound;
+		Level.currentLevelInfo.TotalDropsPerLevel = aLevel.TotalDropsPerLevel;
+		Level.currentLevelInfo.StarScores = aLevel.StarScores;
+		Level.currentLevelInfo.Description = aLevel.Description;
+		Level.currentLevelInfo.AssociatedBoard = aLevel.AssociatedBoard;
+		UnityEngine.SceneManagement.SceneManager.LoadScene("scenes");
+    }
+    public void saveBoard()
+    {
         // get the levelNumber from InputField
-        string levelName = LevelNumber.text;
-        TextWriter tw = new StreamWriter(Application.persistentDataPath + "/levelInfo."+levelName);
+        string boardN = boardName.text;
+        TextWriter tw = new StreamWriter(Application.persistentDataPath + "/board."+boardN);
        
         for (int x=0;x<xDim; x++) {
             for (int y=0; y<yDim; y++) {
@@ -142,8 +203,8 @@ public class LevelDesignGrid : Grid {
     { 
 
 
-        string levelName = LevelNumber.text;
-        this.load(levelName);
+        string boardN = boardName.text;
+        this.load(boardN);
     }
 	
 

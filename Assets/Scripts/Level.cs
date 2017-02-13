@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+using System.IO;
 public class Level : MonoBehaviour {
 
 	public enum LevelType {
@@ -18,7 +18,7 @@ public class Level : MonoBehaviour {
 	GameObject[] levelObjectArray;
 //	public Grid grid;
 	// Use this for initialization
-	void Start () {
+	public void loadLevelsFromResoruceFile() {
 		string myText = LoadResourceTextfile("levelInfo");
 		levels = JsonUtility.FromJson<LevelDescriptions>(myText);
 		LockedLevels = new bool[levels.levelInfo.Length];
@@ -26,7 +26,26 @@ public class Level : MonoBehaviour {
 		for (int i=0; i<levels.levelInfo.Length; i++) {
 			LockedLevels[i] = false;
 		}
+	}
+	public void loadLevelsFromSeperateFiles() {
+		string[] levelFileNames = Directory.GetFiles(Application.persistentDataPath, "level.*");
+		levels.levelInfo = new LevelInfo[levelFileNames.Length];
+		int count = 0;
+		foreach (string afileName in levelFileNames) {
+			TextReader tr = new StreamReader(afileName);
+            string astring = tr.ReadToEnd();
+			tr.Close();
+			levels.levelInfo[count] = JsonUtility.FromJson<LevelInfo>(astring);
+			count++;
+		}
+		LockedLevels = new bool[levels.levelInfo.Length];
+		for (int i=0; i<levels.levelInfo.Length; i++) {
+			LockedLevels[i] = false;
+		}
+	}
 
+	void Start () {
+		loadLevelsFromSeperateFiles();	
 		levelObjectArray= new GameObject[levels.levelInfo.Length];
 		for (int i = 0; i<levels.levelInfo.Length; i++) {
 			int y = i % 15;

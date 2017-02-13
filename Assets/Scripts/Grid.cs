@@ -124,8 +124,10 @@ public class Grid : MonoBehaviour {
         nPiece.transform.parent = transform;
         nextPiece = nPiece.GetComponent<GamePiece>();
         nextPiece.Init(3, -1, this, PieceType.NORMAL);
-        nextPiece.ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, nextPiece.ColorComponent.NumColors - 1));
-        nextPiece.ColorComponent.HiddenColor = ((ColorPiece.ColorType)Random.Range(0, nextPiece.ColorComponent.NumColors - 2));
+        // depending on game mode, next piece is either number, or number or EGG
+        // TODO
+        nextPiece.ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, 8));
+        nextPiece.ColorComponent.HiddenColor = ((ColorPiece.ColorType)Random.Range(0, 7));
         
 
         hammer = (GameObject)Instantiate(hammerPrefab, GetWorldPosition(3, -1), Quaternion.identity);
@@ -191,6 +193,7 @@ public class Grid : MonoBehaviour {
             pieces[x, yDim-1].Init(x, yDim, this, PieceType.NORMAL);
             pieces[x, yDim-1].MovableComponent.Move(x, yDim-1, 0.01f);
             pieces[x, yDim-1].ColorComponent.SetColor(ColorPiece.ColorType.EGG);
+            pieces[x, yDim-1].ColorComponent.HiddenColor = (ColorPiece.ColorType)Random.Range(0, 7);
 
         }
 
@@ -458,7 +461,9 @@ public class Grid : MonoBehaviour {
                 pieces[x, 0].MovableComponent.Move(x, 0, fillTime);
                 pieces[x, 0].ColorComponent.SetColor(nextPiece.ColorComponent.Color);
 
-                nextPiece.ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, nextPiece.ColorComponent.NumColors - 1));
+// TODO: depending on GameMode
+// next piece is either from a drop list, a random number, or a random number and egg
+                nextPiece.ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, 8));
             }
             StartCoroutine(fillAndUpdate(currentGameStats.currentChainLevel));
         }
@@ -1034,8 +1039,8 @@ public class Grid : MonoBehaviour {
     public void load(string levelName)
     {         
         string astring = null;
-        if (File.Exists( Application.persistentDataPath + "/levelInfo."+levelName)) {
-            TextReader tr = new StreamReader(Application.persistentDataPath + "/levelInfo."+levelName);
+        if (File.Exists( Application.persistentDataPath + "/board."+levelName)) {
+            TextReader tr = new StreamReader(Application.persistentDataPath + "/board."+levelName);
             astring = tr.ReadToEnd();
         }
         if (astring != null) {
