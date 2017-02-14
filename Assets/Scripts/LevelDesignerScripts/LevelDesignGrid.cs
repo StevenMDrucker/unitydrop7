@@ -14,11 +14,14 @@ public class LevelDesignGrid : Grid {
 	public GamePiece previewPiece;
     public InputField LevelNumber;
     public InputField boardName;
-    public InputField LevelType;
+    public Dropdown LevelType;
+    public Dropdown DropType;
     public InputField Description;
     public InputField DropsPerRound;
     public InputField ScorePerRound;
-    public InputField StarScores;
+    public InputField Star1;
+    public InputField Star2;
+    public InputField Star3;
     public InputField TotalDropsPerLevel;
     public InputField AssociatedBoard;
 
@@ -127,16 +130,44 @@ public class LevelDesignGrid : Grid {
         LevelInfo aLevel = new LevelInfo();
         aLevel.AssociatedBoard = AssociatedBoard.text;
         aLevel.Description = Description.text;
-        aLevel.DropsPerRound = int.Parse( DropsPerRound.text);
-        aLevel.levelNo = int.Parse(LevelNumber.text);
-        aLevel.LevelType = LevelType.text;
-        aLevel.DropType = "";
+        int dropsperround = 10;
+        if (int.TryParse( DropsPerRound.text, out dropsperround)) {
+            aLevel.DropsPerRound = dropsperround;
+        } else {
+            aLevel.DropsPerRound = dropsperround;
+        }
+        int levelno = 0;
+
+        if (int.TryParse(LevelNumber.text, out levelno)) {
+            aLevel.levelNo = levelno;
+        } else {
+            aLevel.levelNo = levelno;
+        }
+        aLevel.LevelType = LevelType.options[LevelType.value].text;
+
+        aLevel.DropType = DropType.options[DropType.value].text;
+        int star1 = 1000;
+        int star2 = 2000;
+        int star3 = 3000;
+        bool parsed=  (int.TryParse(Star1.text, out star1));
+        parsed=  (int.TryParse(Star2.text, out star2));
+        parsed=  (int.TryParse(Star3.text, out star3));
         aLevel.StarScores = new long[3];
-        aLevel.StarScores[0] = 100L;
-        aLevel.StarScores[1] = 200L;
-        aLevel.StarScores[2] = 300L;
-//        aLevel.StarScores = StarScores.text;
-        aLevel.ScorePerRound = int.Parse(ScorePerRound.text);
+        if (parsed) {
+            aLevel.StarScores[0] = star1;
+            aLevel.StarScores[1] = star2;
+            aLevel.StarScores[2] = star3;
+        } else {
+            aLevel.StarScores[0] = star1;
+            aLevel.StarScores[1] = star2;
+            aLevel.StarScores[2] = star3;            
+        }
+        int scoreperround;
+        if (int.TryParse(ScorePerRound.text, out scoreperround)) {
+            aLevel.ScorePerRound = scoreperround;
+        } else {
+            aLevel.ScorePerRound = 1000; // TODO CHOOSE DEFAULTS
+        }
         string jsonLevel = JsonUtility.ToJson(aLevel);
         TextWriter tw = new StreamWriter(Application.persistentDataPath + "/level."+aLevel.levelNo.ToString());
         tw.Write(jsonLevel);
@@ -152,8 +183,9 @@ public class LevelDesignGrid : Grid {
         aLevel.Description = Description.text;
     
         aLevel.DropsPerRound = int.Parse( DropsPerRound.text);
+        aLevel.DropType = DropType.options[DropType.value].text;
         aLevel.levelNo = int.Parse(LevelNumber.text);
-        aLevel.LevelType = LevelType.text;
+        aLevel.LevelType = LevelType.options[LevelType.value].text;
         aLevel.StarScores = new long[3];
         aLevel.StarScores[0] = 100L;
         aLevel.StarScores[1] = 200L;
@@ -207,5 +239,7 @@ public class LevelDesignGrid : Grid {
         this.load(boardN);
     }
 	
-
+    public void toMainScreen() {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("LoadScene");
+    }
 }

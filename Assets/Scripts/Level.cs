@@ -50,7 +50,7 @@ public class Level : MonoBehaviour {
 		for (int i = 0; i<levels.levelInfo.Length; i++) {
 			int y = i % 15;
 			int x = i / 15;
-			GameObject newObject = (GameObject)Instantiate(levelButtonPrefab, new Vector2((float)x * 10.0f + 350.0f, -20.0f +  (float)y * -30.0f + 450.0f), Quaternion.identity);
+			GameObject newObject = (GameObject)Instantiate(levelButtonPrefab, new Vector2((float)x * 10.0f + 350.0f, -20.0f +  (float)y * -60.0f + 450.0f), Quaternion.identity);
 			//newObject.transform.localScale = new Vector2(0.2f,0.2f);
 			newObject.transform.SetParent(this.transform);
 			levelObjectArray[i]=newObject;

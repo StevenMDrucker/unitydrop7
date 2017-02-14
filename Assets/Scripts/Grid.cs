@@ -167,7 +167,7 @@ public class Grid : MonoBehaviour {
             GamePiece piece = pieces[x, 0];
             if (piece.Type != PieceType.EMPTY)
             {
-                gameOver();
+                gameOver(0);
             } else { 
                 Destroy(pieces[x, 0].gameObject);
             }
@@ -460,10 +460,15 @@ public class Grid : MonoBehaviour {
                 pieces[x, 0].Init(x, -1, this, PieceType.NORMAL);
                 pieces[x, 0].MovableComponent.Move(x, 0, fillTime);
                 pieces[x, 0].ColorComponent.SetColor(nextPiece.ColorComponent.Color);
+                pieces[x, 0].ColorComponent.HiddenColor = (ColorPiece.ColorType)Random.Range(0, 7);
 
 // TODO: depending on GameMode
 // next piece is either from a drop list, a random number, or a random number and egg
-                nextPiece.ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, 8));
+                if (Level.currentLevelInfo.DropType == "OnlyNumbers") {
+                    nextPiece.ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, 7));
+                } else {
+                    nextPiece.ColorComponent.SetColor((ColorPiece.ColorType)Random.Range(0, 8));
+                }
             }
             StartCoroutine(fillAndUpdate(currentGameStats.currentChainLevel));
         }
@@ -1015,18 +1020,21 @@ public class Grid : MonoBehaviour {
             }
         }
         if (!hasEmpty) {
-            gameOver();
+            gameOver(0);
         }
 
 
         if (Level.currentLevelInfo.TotalDropsPerLevel > 0) {
             if (currentGameStats.currentDrop >= Level.currentLevelInfo.TotalDropsPerLevel) {
-                gameOver();
+                gameOver(0);
             }
         }
 
         if (Level.currentLevelInfo.LevelType == "ClearObsctacles") {
-
+            int count = countObstacles();
+            if (count == 0) {
+                gameOver(1);
+            }
         }
     }  
 
@@ -1035,8 +1043,25 @@ public class Grid : MonoBehaviour {
         return(true);
     }
     
-    public void gameOver()
+    public int countObstacles() {
+        int count = 0;
+
+        for (int i=0; i<xDim;i++) {
+            for (int j=0;j<yDim;j++) {
+                if (pieces[i,j].Type==PieceType.NORMAL) {
+                    if (pieces[i,j].ColorComponent.Color == ColorPiece.ColorType.BARRIER ||
+                    pieces[i,j].ColorComponent.Color == ColorPiece.ColorType.BARRIERCRACKED ||
+                    pieces[i,j].ColorComponent.Color == ColorPiece.ColorType.SAND) {
+                        count++;
+                    }
+                }
+            }
+        }
+        return(count);
+    }
+    public void gameOver(int status)
     {
+        // if status == 1 then it's a win
         // TODO: we should change the game over dialog to be win or lose based on result
         if (UIDisplayComponent) {
             mode = InteractMode.GAMEOVER;
