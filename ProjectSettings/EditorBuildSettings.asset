@@ -9,3 +9,5 @@ EditorBuildSettings:
     path: Assets/Scenes/LoadScene.unity
   - enabled: 1
     path: Assets/Scenes/scenes.unity
+  - enabled: 1
+    path: Assets/Scenes/levelDesigner.unity
