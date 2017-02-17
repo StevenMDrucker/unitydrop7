@@ -1074,13 +1074,8 @@ public class Grid : MonoBehaviour {
     }
 
 
-    public void load(string levelName)
-    {         
-        string astring = null;
-        if (File.Exists( Application.persistentDataPath + "/board."+levelName)) {
-            TextReader tr = new StreamReader(Application.persistentDataPath + "/board."+levelName);
-            astring = tr.ReadToEnd();
-        }
+    public void loadFromString(string astring) 
+    {
         if (astring != null) {
             string [] splitstring = astring.Split(',');
 
@@ -1108,7 +1103,50 @@ public class Grid : MonoBehaviour {
                     }
                 }
             }
-
         }
+    }
+
+    public void loadFromResource(string levelName)
+    {
+        BoardInfo theBoard = Level.boardMap[levelName];
+        for (int i = 0; i< theBoard.boardPieces.Length;i++) {
+            ClearPiece(i / 7, i %7, 0);
+            if (theBoard.boardPieces[i] == 0) {
+                SpawnNewPiece(i / 7, i%7, PieceType.EMPTY);
+            } else {
+                int pieceNum = theBoard.boardPieces[i];
+                if (pieceNum > 200) {
+                    int pieceColor = pieceNum % 100;
+                    GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
+                    aPiece.ColorComponent.SetColor(ColorPiece.ColorType.EGGCRACKED);
+                    aPiece.ColorComponent.HiddenColor = ((ColorPiece.ColorType)pieceColor-1);
+                } else if (pieceNum > 100) {
+                    int pieceColor = pieceNum % 100;
+                    GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
+                    aPiece.ColorComponent.SetColor(ColorPiece.ColorType.EGG);
+                    aPiece.ColorComponent.HiddenColor = ((ColorPiece.ColorType)pieceColor-1);
+                } else {
+                    int pieceColor = pieceNum % 100;
+                    GamePiece aPiece = SpawnNewPiece(i / 7, i % 7, PieceType.NORMAL);
+                    aPiece.ColorComponent.SetColor((ColorPiece.ColorType)pieceColor-1);
+                    aPiece.ColorComponent.HiddenColor = (ColorPiece.ColorType)Random.Range(0, 7);
+                }
+            }
+        }
+    }
+    public void load(string levelName)
+    {
+        // check if board is in resources (loaded into level boardMap)         
+        if (Level.boardMap.ContainsKey(levelName)) {
+            loadFromResource(levelName);
+        } else {
+            string astring = null;
+            if (File.Exists( Application.persistentDataPath + "/board."+levelName)) {
+                TextReader tr = new StreamReader(Application.persistentDataPath + "/board."+levelName);
+                astring = tr.ReadToEnd();
+            }
+            loadFromString(astring);
+        }
+        
     }
 }

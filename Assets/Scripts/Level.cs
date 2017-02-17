@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.IO;
+using System.Collections;
+using System.Collections.Generic;
 public class Level : MonoBehaviour {
 
 	public enum LevelType {
@@ -9,35 +11,46 @@ public class Level : MonoBehaviour {
 	};
 
 	public LevelDescriptions levels;
+	public BoardDescriptions boards;
+	
 	public bool[] LockedLevels;
 	
 	public GameObject levelButtonPrefab;
 
 
 	static public LevelInfo currentLevelInfo = new LevelInfo();
+	static public Dictionary<string,BoardInfo> boardMap;
 	GameObject[] levelObjectArray;
 //	public Grid grid;
 	// Use this for initialization
-	public void loadLevelsFromResoruceFile() {
+	public void loadLevelsFromResourceFile() {
 		string myText = LoadResourceTextfile("levelInfo");
 		levels = JsonUtility.FromJson<LevelDescriptions>(myText);
-		LockedLevels = new bool[levels.levelInfo.Length];
-		//TODO: keep track of locked levels, for now, make them all unlocked
-		for (int i=0; i<levels.levelInfo.Length; i++) {
-			LockedLevels[i] = false;
+
+		string myBoard = LoadResourceTextfile("boardInfo");
+		boards = JsonUtility.FromJson<BoardDescriptions>(myBoard);
+		boardMap = new Dictionary<string, BoardInfo>();
+		foreach (BoardInfo aBoard in boards.boardInfo) {
+			boardMap[aBoard.BoardName] = aBoard;
 		}
 	}
 	public void loadLevelsFromSeperateFiles() {
 		string[] levelFileNames = Directory.GetFiles(Application.persistentDataPath, "level.*");
-		levels.levelInfo = new LevelInfo[levelFileNames.Length];
+		int startloc = levels.levelInfo.Length;
+		int additionalLevels = levelFileNames.Length;
+		
+		System.Array.Resize(ref levels.levelInfo, startloc+additionalLevels);
+//		levels.levelInfo = new LevelInfo[levelFileNames.Length];
 		int count = 0;
 		foreach (string afileName in levelFileNames) {
 			TextReader tr = new StreamReader(afileName);
             string astring = tr.ReadToEnd();
 			tr.Close();
-			levels.levelInfo[count] = JsonUtility.FromJson<LevelInfo>(astring);
+			levels.levelInfo[startloc+count] = JsonUtility.FromJson<LevelInfo>(astring);
 			count++;
 		}
+
+
 		LockedLevels = new bool[levels.levelInfo.Length];
 		for (int i=0; i<levels.levelInfo.Length; i++) {
 			LockedLevels[i] = false;
@@ -45,12 +58,13 @@ public class Level : MonoBehaviour {
 	}
 
 	void Start () {
+		loadLevelsFromResourceFile();
 		loadLevelsFromSeperateFiles();	
 		levelObjectArray= new GameObject[levels.levelInfo.Length];
 		for (int i = 0; i<levels.levelInfo.Length; i++) {
-			int y = i % 15;
-			int x = i / 15;
-			GameObject newObject = (GameObject)Instantiate(levelButtonPrefab, new Vector2((float)x * 10.0f + 350.0f, -20.0f +  (float)y * -60.0f + 450.0f), Quaternion.identity);
+			int y = i % 10;
+			int x = i / 10;
+			GameObject newObject = (GameObject)Instantiate(levelButtonPrefab, new Vector2((float)x * 10.0f + 220.0f, (float)y * -60.0f + 450.0f), Quaternion.identity);
 			//newObject.transform.localScale = new Vector2(0.2f,0.2f);
 			newObject.transform.SetParent(this.transform);
 			levelObjectArray[i]=newObject;
@@ -119,16 +133,28 @@ public class LevelDescriptions
 }
 
 [System.Serializable]
-	public class LevelInfo
-	{
-		public int levelNo;
-		public string LevelType;
-		public string Description;
-		public int  DropsPerRound;
-		public int ScorePerRound;
-		public string DropType;
-		public long [] StarScores;
-		public int TotalDropsPerLevel;
-		public string AssociatedBoard;
+public class LevelInfo
+{
+	public int levelNo;
+	public string LevelType;
+	public string Description;
+	public int  DropsPerRound;
+	public int ScorePerRound;
+	public string DropType;
+	public long [] StarScores;
+	public int TotalDropsPerLevel;
+	public string AssociatedBoard;
 
-	}
+}
+
+public class BoardDescriptions
+{
+	public BoardInfo[] boardInfo;
+
+}
+
+[System.Serializable]
+public class BoardInfo {
+	public string BoardName;
+	public int []boardPieces;
+}

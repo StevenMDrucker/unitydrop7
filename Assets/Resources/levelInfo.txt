@@ -3,58 +3,46 @@
         {
             "levelNo": 0,
             "LevelType": "Score",
+            "Description": "Infinite drops, 5 drops per round, no egg drop",
             "DropsPerRound": 5,
             "ScorePerRound": 15000,
+            "DropType": "NoEgg",            
+            "StarScores": [100, 500, 1000],            
             "TotalDropsPerLevel": -1,
-            "StarScores": [100, 500, 1000],
-            "Description": "Infinite drops, 5 drops per round, no egg drop",
-            "DropType": "NoEgg",
             "AssociatedBoard": ""
         },
         {
             "levelNo": 1,
             "LevelType": "Score",
+            "Description": "Infinite drops, 5 drops per round",
             "DropsPerRound": 15,
             "ScorePerRound": 5000,
+            "DropType": "All",            
+            "StarScores": [100, 500, 1000],            
             "TotalDropsPerLevel": -1,
-            "StarScores": [100, 500, 1000],
-            "Description": "Infinite drops, 5 drops per round",
-            "DropType": "All",
             "AssociatedBoard": ""
         },
         {
             "levelNo": 2,
             "LevelType": "Score",
+            "Description": "8 drops, 5 drops per round, no egg drop, B1",
             "DropsPerRound": 5,
             "ScorePerRound": 5000,
-            "TotalDropsPerLevel": 8,
-            "StarScores": [100, 500, 1000],
-            "Description": "8 drops, 5 drops per round, no egg drop",
             "DropType": "NoEgg",
-            "AssociatedBoard": ""            
+            "StarScores": [100, 500, 1000],
+            "TotalDropsPerLevel": 8,
+            "AssociatedBoard": "B1"            
         },
         {
             "levelNo": 3,
             "LevelType": "Score",
+            "Description": "8 drops, 5 drops per round, no egg drop, B2",
             "DropsPerRound": 5,
             "ScorePerRound": 5000,
-            "TotalDropsPerLevel": 8,
-            "StarScores": [100, 500, 1000],
-            "Description": "8 drops, 5 drops per round, no egg drop",
             "DropType": "NoEgg",
-            "AssociatedBoard": ""
-        },
-        {
-            "levelNo": 4,
-            "LevelType": "Score",
-            "DropsPerRound": 5,
-            "ScorePerRound": 5000,
+            "StarScores": [100, 500, 1000],            
             "TotalDropsPerLevel": 8,
-            "StarScores": [100, 500, 1000],
-            "Description": "8 drops, 5 drops per round, no egg drop, starting board",
-            "DropType": "NoEgg",
-            "AssociatedBoard": "2"
+            "AssociatedBoard": "B2"
         }
-
     ]
 }
