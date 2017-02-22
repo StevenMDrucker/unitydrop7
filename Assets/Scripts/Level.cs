@@ -23,7 +23,7 @@ public class Level : MonoBehaviour {
 	GameObject[] levelObjectArray;
 //	public Grid grid;
 	// Use this for initialization
-	public void loadLevelsFromResourceFile() {
+	public int loadLevelsFromResourceFile() {
 		string myText = LoadResourceTextfile("levelInfo");
 		levels = JsonUtility.FromJson<LevelDescriptions>(myText);
 
@@ -33,8 +33,9 @@ public class Level : MonoBehaviour {
 		foreach (BoardInfo aBoard in boards.boardInfo) {
 			boardMap[aBoard.BoardName] = aBoard;
 		}
+		return(levels.levelInfo.Length);
 	}
-	public void loadLevelsFromSeperateFiles() {
+	public int loadLevelsFromSeperateFiles() {
 		string[] levelFileNames = Directory.GetFiles(Application.persistentDataPath, "level.*");
 		int startloc = levels.levelInfo.Length;
 		int additionalLevels = levelFileNames.Length;
@@ -55,16 +56,17 @@ public class Level : MonoBehaviour {
 		for (int i=0; i<levels.levelInfo.Length; i++) {
 			LockedLevels[i] = false;
 		}
+		return(additionalLevels);
 	}
 
 	void Start () {
-		loadLevelsFromResourceFile();
+		int rlevels = loadLevelsFromResourceFile();
 		loadLevelsFromSeperateFiles();	
 		levelObjectArray= new GameObject[levels.levelInfo.Length];
 		for (int i = 0; i<levels.levelInfo.Length; i++) {
 			int y = i % 10;
 			int x = i / 10;
-			GameObject newObject = (GameObject)Instantiate(levelButtonPrefab, new Vector2((float)x * 10.0f + 220.0f, (float)y * -60.0f + 450.0f), Quaternion.identity);
+			GameObject newObject = (GameObject)Instantiate(levelButtonPrefab, new Vector2((float)x * 300.0f + 220.0f, (float)y * -60.0f + 450.0f), Quaternion.identity);
 			//newObject.transform.localScale = new Vector2(0.2f,0.2f);
 			newObject.transform.SetParent(this.transform);
 			levelObjectArray[i]=newObject;
@@ -75,7 +77,11 @@ public class Level : MonoBehaviour {
 
 			theButton.onClick.AddListener (() => {HandleClick(y);});
         	UnityEngine.UI.Text thetext = scoreText.GetComponent<UnityEngine.UI.Text>();
-			thetext.text = "Level " + i.ToString() + " Description: " + levels.levelInfo[i].Description;
+			if (i>=rlevels) {
+				thetext.text = "User Level: Description: " + levels.levelInfo[i].Description;	
+			} else {
+				thetext.text = "Level: Description: " + levels.levelInfo[i].Description;
+			}
 			// TODO SHOW WHICH LEVELS ARE LOCKED OR NOT!
  		}
 	}

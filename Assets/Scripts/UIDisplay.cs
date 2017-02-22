@@ -60,12 +60,44 @@ public class UIDisplay : MonoBehaviour {
 		}
 	}
 	
-	 
+	public string GameTypeText {
+		get {return gameTypeText.text;}
+		set {
+			gameTypeText.text = value;
+		}
+	}
+	
+	public string GameOverText {
+		get {return gameOverText.text;}
+		set {
+			gameOverText.text = value;
+		}
+	}
+	
+	private Text finalScoreText;
+	public string FinalScoreText {
+		get {return finalScoreText.text;}
+		set {
+			finalScoreText.text = value;
+		}
+	}
+
+	private Text starLevelText;
+	public string StarLevelText {
+		get {return starLevelText.text;}
+		set {
+			starLevelText.text = value;
+		}
+	}
 	private Text dropsLeftText;
 	private Text currentScoreText;
 	private Text chainNumberText;
+	private Text gameTypeText;
+
+	private Text gameOverText;
 	private Text levelNoText;
 
+	private Grid grid;
 	private numDropIndicator DropIndicator;
 
 	void Start () {
@@ -77,24 +109,44 @@ public class UIDisplay : MonoBehaviour {
 		
 	}
 
+	public void Init(Grid aGrid)
+	{
+		grid = aGrid;
+	}
 	void Awake() {
-		GameObject dleft = this.transform.FindDeepChild("DropsLeft").gameObject;
-		dropsLeftText = dleft.GetComponent<UnityEngine.UI.Text>();
+		GameObject anObject;
+		anObject = this.transform.FindDeepChild("DropsLeft").gameObject;
+		dropsLeftText = anObject.GetComponent<UnityEngine.UI.Text>();
 
 		DropsLeftText = "";
-		GameObject cscore = this.transform.FindDeepChild("CurrentScore").gameObject;
-		currentScoreText = cscore.GetComponent<UnityEngine.UI.Text>();
+		anObject = this.transform.FindDeepChild("CurrentScore").gameObject;
+		currentScoreText = anObject.GetComponent<UnityEngine.UI.Text>();
 		CurrentScoreText = "";
 
 
-		GameObject cnumber = this.transform.FindDeepChild("ChainLevel").gameObject;
-		chainNumberText = cnumber.GetComponent<UnityEngine.UI.Text>();
+		anObject = this.transform.FindDeepChild("ChainLevel").gameObject;
+		chainNumberText = anObject.GetComponent<UnityEngine.UI.Text>();
 		ChainNumberText = "";
 
-		GameObject levelno = this.transform.FindDeepChild("LevelNo").gameObject;
-		levelNoText = levelno.GetComponent<UnityEngine.UI.Text>();
+		anObject = this.transform.FindDeepChild("LevelNo").gameObject;
+		levelNoText = anObject.GetComponent<UnityEngine.UI.Text>();
 		LevelNoText = "";
 
+		anObject = this.transform.FindDeepChild("GameTypeText").gameObject;
+		gameTypeText = anObject.GetComponent<UnityEngine.UI.Text>();
+		GameTypeText = "";
+
+		anObject = this.transform.FindDeepChild("GameOverText").gameObject;
+		gameOverText = anObject.GetComponent<UnityEngine.UI.Text>();
+		GameOverText = "";
+
+		anObject = this.transform.FindDeepChild("FinalScore").gameObject;
+		finalScoreText = anObject.GetComponent<UnityEngine.UI.Text>();
+		FinalScoreText = "";
+
+		anObject = this.transform.FindDeepChild("StarLevel").gameObject;
+		starLevelText = anObject.GetComponent<UnityEngine.UI.Text>();
+		StarLevelText = "";
 
 		DropIndicator = NumDropsIndicator.GetComponent<numDropIndicator>();
 		            
@@ -118,9 +170,25 @@ public class UIDisplay : MonoBehaviour {
 	}
 
 	
-	public void showGameOver(){
+	public void showGameOver(bool win){
 		GameOver theGameOver =  gameOver.GetComponent<GameOver>();
 
+		FinalScoreText = grid.currentGameStats.currentScore.ToString();
+		if (grid.currentGameStats.currentScore < Level.currentLevelInfo.StarScores[0]) {
+			StarLevelText = "Stars: 0";
+		} else if (grid.currentGameStats.currentScore < Level.currentLevelInfo.StarScores[1]) {
+			StarLevelText = "Stars: 1";
+		} else if (grid.currentGameStats.currentScore < Level.currentLevelInfo.StarScores[2]) {
+			StarLevelText = "Stars: 2";
+		} else {
+			StarLevelText = "Stars: 3";
+		}
+
+		if (win) {
+			GameOverText = "You Win!";
+		} else {
+			GameOverText = "Not this time...";
+		}
 		if (theGameOver) {
 			theGameOver.ShowWin();
 		}

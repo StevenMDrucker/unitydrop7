@@ -148,13 +148,17 @@ public class Grid : MonoBehaviour {
     void Awake()
     {            
             UIDisplayComponent = mainDisplay.GetComponent<UIDisplay>();
+
             if (UIDisplayComponent) {
+                UIDisplayComponent.Init(this);
                 if (Level.currentLevelInfo.TotalDropsPerLevel > 0) {
                     UIDisplayComponent.DropsLeftText = Level.currentLevelInfo.TotalDropsPerLevel.ToString();
                 } else {
                     UIDisplayComponent.DropsLeftText = "Unlimited";
                 }        
                 UIDisplayComponent.SetTotalDrops(Level.currentLevelInfo.DropsPerRound);
+
+                UIDisplayComponent.GameTypeText = "GameType: " + Level.currentLevelInfo.LevelType;
             }
             currentGameStats.init();
               
@@ -1030,7 +1034,7 @@ public class Grid : MonoBehaviour {
             }
         }
 
-        if (Level.currentLevelInfo.LevelType == "ClearObsctacles") {
+        if (Level.currentLevelInfo.LevelType == "Obstacle") {
             int count = countObstacles();
             if (count == 0) {
                 gameOver(1);
@@ -1040,7 +1044,7 @@ public class Grid : MonoBehaviour {
 
     public bool checkForWin() {
         // TODO:  this is where we should evaluate whether we won the game or not
-        return(true);
+        return(false);
     }
     
     public int countObstacles() {
@@ -1063,12 +1067,17 @@ public class Grid : MonoBehaviour {
     {
         // if status == 1 then it's a win
         // TODO: we should change the game over dialog to be win or lose based on result
+        bool aWin = false;
+        if (status == 0) {
+            aWin = checkForWin();
+        }
         if (UIDisplayComponent) {
             mode = InteractMode.GAMEOVER;
-            if (checkForWin()) {
-                UIDisplayComponent.showGameOver();           
+
+            if (status == 1 || aWin) {
+                UIDisplayComponent.showGameOver(true);           
             } else {
-                UIDisplayComponent.showGameOver();   
+                UIDisplayComponent.showGameOver(false);   
             }
         }
     }
@@ -1141,8 +1150,9 @@ public class Grid : MonoBehaviour {
             loadFromResource(levelName);
         } else {
             string astring = null;
-            if (File.Exists( Application.persistentDataPath + "/board."+levelName)) {
-                TextReader tr = new StreamReader(Application.persistentDataPath + "/board."+levelName);
+            string filestring = Application.persistentDataPath + "/board."+levelName; 
+            if (File.Exists( filestring)) {
+                TextReader tr = new StreamReader(filestring);
                 astring = tr.ReadToEnd();
             }
             loadFromString(astring);
