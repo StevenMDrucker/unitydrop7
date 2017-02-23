@@ -4996,7 +4996,9 @@ MonoBehaviour:
     m_Options:
     - m_Text: Score
       m_Image: {fileID: 0}
-    - m_Text: ClearObstacle
+    - m_Text: Obstacle
+      m_Image: {fileID: 0}
+    - m_Text: ClearToLevel
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
