@@ -31,7 +31,7 @@
             "DropType": "NoEgg",
             "StarScores": [100, 500, 1000],
             "TotalDropsPerLevel": 8,
-            "AssociatedBoard": "B1"            
+            "AssociatedBoard": "IB1"            
         },
         {
             "levelNo": 3,
@@ -42,7 +42,7 @@
             "DropType": "NoEgg",
             "StarScores": [100, 500, 1000],            
             "TotalDropsPerLevel": -1,
-            "AssociatedBoard": "B2"
+            "AssociatedBoard": "IOBS"
         },
         {
             "levelNo": 4,
@@ -53,7 +53,7 @@
             "DropType": "NoEgg",
             "StarScores": [100, 500, 1000],            
             "TotalDropsPerLevel": -1,
-            "AssociatedBoard": "B4"
+            "AssociatedBoard": "IB4"
         }
 
     ]
